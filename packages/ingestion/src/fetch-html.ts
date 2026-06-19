@@ -16,6 +16,15 @@ export type FetchHtmlResult = {
   readonly statusCode: number;
 };
 
+const desktopBrowserHeaders = {
+  accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+  "cache-control": "no-cache",
+  "upgrade-insecure-requests": "1",
+  "user-agent":
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+} as const;
+
 export async function fetchHtml(input: FetchHtmlInput): Promise<FetchHtmlResult> {
   return fetchHtmlWithRedirects(input.url, input.policy, 0);
 }
@@ -53,9 +62,17 @@ async function fetchHtmlWithRedirects(
     });
   }
 
+  const html = response.body.toString("utf8");
+  if (isUnsupportedBrowserPage(url, html)) {
+    throw new FetchError({
+      errorCode: FetchErrorCode.UnsupportedBrowserPage,
+      message: "HTTP response was an unsupported-browser interstitial page.",
+    });
+  }
+
   return {
     finalUrl: url.toString(),
-    html: response.body.toString("utf8"),
+    html,
     statusCode: response.statusCode,
   };
 }
@@ -76,6 +93,7 @@ function requestUrl(url: URL, policy: FetchUrlPolicy): Promise<RawResponse> {
     const chunks: Buffer[] = [];
     let receivedBytes = 0;
     const requestOptions: RequestOptions = {
+      headers: desktopBrowserHeaders,
       hostname: url.hostname,
       method: "GET",
       path: `${url.pathname}${url.search}`,
@@ -143,6 +161,25 @@ function requestUrl(url: URL, policy: FetchUrlPolicy): Promise<RawResponse> {
 
 function isRedirect(statusCode: number): boolean {
   return statusCode >= 300 && statusCode < 400;
+}
+
+function isUnsupportedBrowserPage(url: URL, html: string): boolean {
+  const hostname = url.hostname.toLowerCase();
+  const pathname = url.pathname.toLowerCase();
+  const normalizedHtml = html.toLowerCase();
+  const isKnownUnsupportedBrowserUrl =
+    (hostname === "facebook.com" || hostname.endsWith(".facebook.com")) &&
+    pathname.includes("unsupportedbrowser");
+  const hasUnsupportedBrowserCopy =
+    normalizedHtml.includes("unsupported browser") ||
+    normalizedHtml.includes("unsupportedbrowser") ||
+    normalizedHtml.includes("브라우저를 업데이트") ||
+    normalizedHtml.includes("지원되지 않는 브라우저");
+
+  return (
+    isKnownUnsupportedBrowserUrl ||
+    (pathname.includes("unsupportedbrowser") && hasUnsupportedBrowserCopy)
+  );
 }
 
 function headerValue(value: string | readonly string[] | undefined): string | undefined {

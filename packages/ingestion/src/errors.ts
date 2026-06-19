@@ -5,6 +5,7 @@ export const FetchErrorCode = {
   RedirectLimitExceeded: "REDIRECT_LIMIT_EXCEEDED",
   ResponseTooLarge: "RESPONSE_TOO_LARGE",
   RequestTimeout: "REQUEST_TIMEOUT",
+  UnsupportedBrowserPage: "UNSUPPORTED_BROWSER_PAGE",
   HttpStatusError: "HTTP_STATUS_ERROR",
 } as const;
 

@@ -94,6 +94,19 @@ describe("fetchHtml", () => {
     });
   });
 
+  it("sends desktop browser headers", async () => {
+    const fixture = await createFixtureServer((request, response) => {
+      response.setHeader("content-type", "text/html; charset=utf-8");
+      response.end(`<html><body>${request.headers["user-agent"] ?? ""}</body></html>`);
+    });
+
+    await expect(
+      fetchHtml({ url: `${fixture.origin}/page`, policy: testPolicy() }),
+    ).resolves.toMatchObject({
+      html: expect.stringContaining("Mozilla/5.0"),
+    });
+  });
+
   it("revalidates redirect targets", async () => {
     const fixture = await createFixtureServer((_request, response) => {
       response.statusCode = 302;
@@ -105,6 +118,21 @@ describe("fetchHtml", () => {
       fetchHtml({ url: `${fixture.origin}/redirect`, policy: testPolicy({ allowedHosts: [] }) }),
     ).rejects.toMatchObject({
       errorCode: FetchErrorCode.LocalNetworkBlocked,
+    });
+  });
+
+  it("rejects unsupported-browser interstitial pages", async () => {
+    const fixture = await createFixtureServer((_request, response) => {
+      response.setHeader("content-type", "text/html; charset=utf-8");
+      response.end(
+        "<html><title>Unsupported Browser</title><body>unsupportedbrowser</body></html>",
+      );
+    });
+
+    await expect(
+      fetchHtml({ url: `${fixture.origin}/unsupportedbrowser`, policy: testPolicy() }),
+    ).rejects.toMatchObject({
+      errorCode: FetchErrorCode.UnsupportedBrowserPage,
     });
   });
 

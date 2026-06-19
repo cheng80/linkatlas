@@ -212,6 +212,8 @@ function userMessageForFetchError(errorCode: FetchErrorCode): string {
       return "응답 크기가 허용 한도를 초과했습니다.";
     case FetchErrorCode.RequestTimeout:
       return "URL 요청 시간이 초과되었습니다.";
+    case FetchErrorCode.UnsupportedBrowserPage:
+      return "사이트가 지원되지 않는 브라우저 안내 페이지만 반환했습니다. 브라우저 확장으로 저장해 주세요.";
     case FetchErrorCode.HttpStatusError:
       return "URL 요청이 성공 상태로 끝나지 않았습니다.";
     default:
@@ -258,6 +260,7 @@ function fetchErrorToAppErrorCode(errorCode: FetchErrorCode): AppErrorCode {
     case FetchErrorCode.RedirectLimitExceeded:
     case FetchErrorCode.ResponseTooLarge:
     case FetchErrorCode.RequestTimeout:
+    case FetchErrorCode.UnsupportedBrowserPage:
     case FetchErrorCode.HttpStatusError:
       return AppErrorCode.ProviderUnavailable;
     default:
