@@ -2,10 +2,12 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { app, BrowserWindow } from "electron";
 
+import { registerIngestIpc } from "./ingest-ipc.js";
 import { createSecureWebPreferences, isAllowedNavigation } from "./security.js";
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url));
 const e2eEnvironmentKey = "LINKATLAS_E2E";
+const allowedFetchHostsKey = "LINKATLAS_ALLOWED_FETCH_HOSTS";
 
 export function createMainWindow(): BrowserWindow {
   const preloadPath = join(currentDirectory, "../preload/preload.cjs");
@@ -33,6 +35,7 @@ export function createMainWindow(): BrowserWindow {
 }
 
 app.whenReady().then(() => {
+  registerIngestIpc({ allowedHosts: allowedFetchHosts() });
   createMainWindow();
 
   app.on("activate", () => {
@@ -47,3 +50,14 @@ app.on("window-all-closed", () => {
     app.quit();
   }
 });
+
+function allowedFetchHosts(): readonly string[] {
+  const raw = process.env[allowedFetchHostsKey];
+  if (raw === undefined || raw.trim().length === 0) {
+    return [];
+  }
+  return raw
+    .split(",")
+    .map((host) => host.trim())
+    .filter((host) => host.length > 0);
+}

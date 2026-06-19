@@ -74,10 +74,17 @@ input {
   padding: 18px 24px;
 }
 
-.url-entry,
+.url-entry label,
 .search-entry {
   display: grid;
   gap: 6px;
+}
+
+.url-entry {
+  align-items: end;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(240px, 1fr) auto;
 }
 
 .url-entry span,
@@ -94,6 +101,23 @@ input {
   border-radius: 8px;
   min-height: 40px;
   padding: 0 12px;
+}
+
+button {
+  background: #172026;
+  border: 0;
+  border-radius: 8px;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  min-height: 40px;
+  padding: 0 14px;
+}
+
+button:disabled {
+  background: #909aa3;
+  cursor: not-allowed;
 }
 
 .model-status {
@@ -138,4 +162,15 @@ input {
   line-height: 1.6;
   margin: 0;
   max-width: 680px;
+}
+
+.ingest-message {
+  border-top: 1px solid #d7dde2;
+  color: #465560;
+  margin-top: 14px;
+  padding-top: 16px;
+}
+
+.ingest-message.error {
+  color: #9a3412;
 }

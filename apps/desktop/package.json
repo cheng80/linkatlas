@@ -11,10 +11,11 @@
     "build:renderer": "vite build",
     "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
     "dev": "vite --host 127.0.0.1",
-    "test": "vitest run src"
+    "test": "vitest --root ../.. run apps/desktop/src"
   },
   "dependencies": {
     "@linkatlas/contracts": "workspace:*",
+    "@linkatlas/ingestion": "workspace:*",
     "react": "^19.2.3",
     "react-dom": "^19.2.3"
   },

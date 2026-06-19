@@ -7,3 +7,15 @@ export {
   ContractParseError,
   parseContract,
 } from "./errors.js";
+export type {
+  IngestUrlErrorCode,
+  IngestUrlRequestDto,
+  IngestUrlResultDto,
+} from "./ingest-url.js";
+export {
+  IngestUrlErrorCodeSchema,
+  IngestUrlRequestSchema,
+  IngestUrlResultSchema,
+  parseIngestUrlRequest,
+  parseIngestUrlResult,
+} from "./ingest-url.js";

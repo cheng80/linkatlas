@@ -14,6 +14,12 @@ test("desktop smoke renders shell through typed preload API", async () => {
 
   await expect(window.getByRole("heading", { name: "LinkAtlas" })).toBeVisible();
   await expect(window.getByTestId("app-version")).toHaveText("Version 0.0.0");
+  await expect(window.getByRole("button", { name: "URL 저장" })).toBeDisabled();
+
+  await window.getByLabel("URL").fill("http://127.0.0.1:1/private");
+  await expect(window.getByRole("button", { name: "URL 저장" })).toBeEnabled();
+  await window.getByRole("button", { name: "URL 저장" }).click();
+  await expect(window.getByText("로컬 또는 사설 네트워크 URL은 기본 차단됩니다.")).toBeVisible();
 
   const nodeGlobals = await window.evaluate(() => ({
     hasProcess: "process" in globalThis,

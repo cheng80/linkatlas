@@ -6,6 +6,11 @@ const api: LinkAtlasApi = {
   app: {
     getVersion: async () => ({ name: "LinkAtlas", version: appVersion() }),
   },
+  ingest: {
+    addUrl: async (input) => {
+      return await electron.ipcRenderer.invoke("linkAtlas:ingestUrl", input);
+    },
+  },
 };
 
 function appVersion(): string {

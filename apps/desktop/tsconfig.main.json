@@ -10,6 +10,7 @@
     "tsBuildInfoFile": "dist/.tsbuildinfo/main.tsbuildinfo",
     "types": ["node", "vitest/globals"]
   },
+  "references": [{ "path": "../../packages/contracts" }, { "path": "../../packages/ingestion" }],
   "include": ["src/main/**/*.ts"],
   "exclude": ["src/**/*.test.ts"]
 }
