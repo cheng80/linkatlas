@@ -56,6 +56,10 @@ function App(): React.JSX.Element {
   const [selectedCitation, setSelectedCitation] = useState<AskCitationDto | null>(null);
   const [askStatus, setAskStatus] = useState("idle");
   const [activeAskRequestId, setActiveAskRequestId] = useState<string | null>(null);
+  const [firstRunComplete, setFirstRunComplete] = useState(
+    () => window.localStorage.getItem("linkatlas:first-run-complete") === "1",
+  );
+  const [diagnosticStatus, setDiagnosticStatus] = useState("idle");
 
   useEffect(() => {
     let active = true;
@@ -266,6 +270,17 @@ function App(): React.JSX.Element {
     setAskStatus(result.message ?? "질문을 시작할 수 없습니다.");
   }
 
+  async function runSampleDiagnostic(): Promise<void> {
+    setDiagnosticStatus("checking");
+    const health = await window.linkAtlas.models.health();
+    setDiagnosticStatus(health.ok ? "ollama reachable" : health.message);
+  }
+
+  function completeFirstRun(): void {
+    window.localStorage.setItem("linkatlas:first-run-complete", "1");
+    setFirstRunComplete(true);
+  }
+
   return (
     <main className="shell">
       <aside className="sidebar" aria-label="LinkAtlas navigation">
@@ -325,6 +340,14 @@ function App(): React.JSX.Element {
             onQuestionChange={setAskQuestion}
             onSubmit={submitAsk}
           />
+        ) : view === "settings" ? (
+          <SettingsPanel
+            diagnosticStatus={diagnosticStatus}
+            firstRunComplete={firstRunComplete}
+            ollamaState={ollamaState}
+            onCompleteFirstRun={completeFirstRun}
+            onRunDiagnostic={runSampleDiagnostic}
+          />
         ) : (
           <section className="inbox-panel">
             <p className="eyebrow">Local-first knowledge base</p>
@@ -365,6 +388,71 @@ function App(): React.JSX.Element {
       </section>
     </main>
   );
+}
+
+function SettingsPanel(input: {
+  readonly diagnosticStatus: string;
+  readonly firstRunComplete: boolean;
+  readonly ollamaState: OllamaStatusState;
+  readonly onCompleteFirstRun: () => void;
+  readonly onRunDiagnostic: () => Promise<void>;
+}): React.JSX.Element {
+  const memory = (navigator as Navigator & { readonly deviceMemory?: number }).deviceMemory;
+  return (
+    <section className="inbox-panel">
+      <p className="eyebrow">First run</p>
+      <h2 id="workspace-title">Settings</h2>
+      <div className="setup-panel">
+        <dl>
+          <div className="setup-row">
+            <dt>Ollama</dt>
+            <dd>{ollamaStatusText(input.ollamaState)}</dd>
+          </div>
+          <div className="setup-row">
+            <dt>Memory</dt>
+            <dd>{memory === undefined ? "unknown" : `${memory}GB`}</dd>
+          </div>
+          <div className="setup-row">
+            <dt>Generation</dt>
+            <dd>gemma4:e4b-it-qat</dd>
+          </div>
+          <div className="setup-row">
+            <dt>Embedding</dt>
+            <dd>embeddinggemma:300m-qat-q8_0</dd>
+          </div>
+        </dl>
+        <div className="pull-progress">
+          <span>Model pull</span>
+          <progress value={input.firstRunComplete ? 1 : 0} max={1} />
+        </div>
+        <div className="settings-actions">
+          <button type="button" onClick={() => void input.onRunDiagnostic()}>
+            Sample URL 진단
+          </button>
+          <button type="button" onClick={input.onCompleteFirstRun}>
+            완료
+          </button>
+        </div>
+        <p>{input.diagnosticStatus}</p>
+      </div>
+    </section>
+  );
+}
+
+function ollamaStatusText(state: OllamaStatusState): string {
+  switch (state.kind) {
+    case "checking":
+      return "checking";
+    case "ready":
+      return `${state.modelCount} models`;
+    case "missing":
+      return `missing ${state.model}`;
+    case "unavailable":
+    case "failed":
+      return state.message;
+    default:
+      return assertNever(state);
+  }
 }
 
 function TopicPanel(input: { readonly topics: readonly TopicDto[] }): React.JSX.Element {
@@ -516,12 +604,15 @@ function assertNever(value: never): never {
   throw new Error(`Unhandled state: ${String(value)}`);
 }
 
-function currentView(): "ask" | "inbox" | "topics" {
+function currentView(): "ask" | "inbox" | "settings" | "topics" {
   if (window.location.hash === "#topics") {
     return "topics";
   }
   if (window.location.hash === "#ask") {
     return "ask";
+  }
+  if (window.location.hash === "#settings") {
+    return "settings";
   }
   return "inbox";
 }

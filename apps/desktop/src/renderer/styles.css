@@ -188,6 +188,65 @@ textarea {
   line-height: 1.55;
 }
 
+.setup-panel {
+  background: #ffffff;
+  border: 1px solid #d7dde2;
+  border-radius: 8px;
+  display: grid;
+  gap: 16px;
+  max-width: 760px;
+  padding: 18px;
+}
+
+.setup-panel dl {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+}
+
+.setup-row {
+  background: #f5f7f8;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.setup-panel dt,
+.pull-progress span {
+  color: #66727d;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.setup-panel dd {
+  color: #172026;
+  font-weight: 800;
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.pull-progress {
+  display: grid;
+  gap: 8px;
+}
+
+.pull-progress progress {
+  accent-color: #245c73;
+  inline-size: 100%;
+}
+
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.setup-panel p {
+  color: #465560;
+  margin: 0;
+}
+
 .search-results {
   border-top: 1px solid #d7dde2;
   display: grid;

@@ -36,6 +36,7 @@ package-lock.json
 *.tsbuildinfo
 **/.tsbuildinfo/
 dist/
+apps/desktop/release/
 test-results/
 playwright-report/
 

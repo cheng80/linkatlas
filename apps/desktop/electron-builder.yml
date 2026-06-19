@@ -1,0 +1,16 @@
+appId: app.linkatlas.desktop
+productName: LinkAtlas
+electronVersion: 39.2.7
+directories:
+  output: release
+files:
+  - dist/**/*
+  - package.json
+  - ../../packages/**/dist/**/*
+mac:
+  target:
+    - dmg
+  category: public.app-category.productivity
+  identity: null
+dmg:
+  artifactName: LinkAtlas-${version}-${arch}.${ext}
