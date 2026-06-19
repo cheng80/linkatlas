@@ -18,6 +18,7 @@ import { registerAskIpc } from "./ask-ipc.js";
 import { registerIngestIpc } from "./ingest-ipc.js";
 import { registerJobIpc } from "./job-ipc.js";
 import { registerKnowledgeIpc } from "./knowledge-ipc.js";
+import { registerLibraryIpc } from "./library-ipc.js";
 import { registerModelIpc } from "./model-ipc.js";
 import { registerSearchIpc } from "./search-ipc.js";
 import { createSecureWebPreferences, isAllowedNavigation } from "./security.js";
@@ -63,6 +64,7 @@ export function createMainWindow(): BrowserWindow {
 app.whenReady().then(() => {
   const database = createAppDatabase();
   const jobRepository = createSqliteJobRepository(database);
+  const documentRepository = createSqliteDocumentRepository(database);
   const knowledgeRepository = createSqliteKnowledgeRepository(database);
   const chunkRepository = createSqliteChunkRepository(database);
   const vectorIndex = new InMemoryVectorIndex();
@@ -78,7 +80,7 @@ app.whenReady().then(() => {
     allowedHosts: allowedFetchHosts(),
     analysisModel: defaultAnalysisModel,
     chunkRepository,
-    documentRepository: createSqliteDocumentRepository(database),
+    documentRepository,
     embeddingModel: defaultEmbeddingModel,
     embeddingProvider,
     generationProvider,
@@ -88,6 +90,7 @@ app.whenReady().then(() => {
     vectorIndex,
   });
   registerJobIpc({ jobRepository });
+  registerLibraryIpc({ documentRepository });
   registerKnowledgeIpc({ knowledgeRepository });
   registerAskIpc({
     chunkRepository,

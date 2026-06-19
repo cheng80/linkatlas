@@ -93,6 +93,7 @@ describe("SQLite document repository", () => {
         const repository = createSqliteDocumentRepository(secondConnection);
 
         expect(repository.getDocumentSnapshot(document.id)).toEqual({ document, version, blocks });
+        expect(repository.listRecent({ limit: 5 })).toEqual([document]);
       } finally {
         secondConnection.close();
       }

@@ -2,6 +2,7 @@ import type {
   AskCitationDto,
   DocumentSummaryDto,
   JobDto,
+  LibraryDocumentDto,
   RelatedDocumentDto,
   SearchResultDto,
   TopicDto,
@@ -9,11 +10,15 @@ import type {
 import { StrictMode, useCallback, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 
+import { installDevLinkAtlasApi } from "./dev-link-atlas-api.js";
 import { JobList } from "./job-list.js";
 import { LibraryCard } from "./library-card.js";
+import { LibraryPanel } from "./library-panel.js";
 import { OllamaStatusBadge, type OllamaStatusState } from "./ollama-status-badge.js";
 import { SummaryCard } from "./summary-card.js";
 import "./styles.css";
+
+installDevLinkAtlasApi();
 
 type IngestState =
   | { readonly kind: "idle" }
@@ -46,6 +51,7 @@ function App(): React.JSX.Element {
   const [searchResults, setSearchResults] = useState<readonly SearchResultDto[]>([]);
   const [ingestState, setIngestState] = useState<IngestState>({ kind: "idle" });
   const [jobs, setJobs] = useState<readonly JobDto[]>([]);
+  const [libraryDocuments, setLibraryDocuments] = useState<readonly LibraryDocumentDto[]>([]);
   const [topics, setTopics] = useState<readonly TopicDto[]>([]);
   const [relatedSourceId, setRelatedSourceId] = useState<string | null>(null);
   const [relatedDocuments, setRelatedDocuments] = useState<readonly RelatedDocumentDto[]>([]);
@@ -90,9 +96,15 @@ function App(): React.JSX.Element {
     setJobs(result.jobs);
   }, []);
 
+  const refreshLibrary = useCallback(async (): Promise<void> => {
+    const result = await window.linkAtlas.library.list();
+    setLibraryDocuments(result.documents);
+  }, []);
+
   useEffect(() => {
     void refreshJobs();
-  }, [refreshJobs]);
+    void refreshLibrary();
+  }, [refreshJobs, refreshLibrary]);
 
   const refreshTopics = useCallback(async (): Promise<void> => {
     const result = await window.linkAtlas.knowledge.listTopics();
@@ -145,7 +157,10 @@ function App(): React.JSX.Element {
     if (view === "topics") {
       void refreshTopics();
     }
-  }, [refreshTopics, view]);
+    if (view === "library") {
+      void refreshLibrary();
+    }
+  }, [refreshLibrary, refreshTopics, view]);
 
   useEffect(() => {
     let active = true;
@@ -203,6 +218,7 @@ function App(): React.JSX.Element {
         summary: result.summary,
       });
       await refreshJobs();
+      await refreshLibrary();
       await refreshTopics();
       await refreshRelated(result.documentId);
       return;
@@ -327,7 +343,9 @@ function App(): React.JSX.Element {
           </div>
           <OllamaStatusBadge state={ollamaState} />
         </header>
-        {view === "topics" ? (
+        {view === "library" ? (
+          <LibraryPanel documents={libraryDocuments} />
+        ) : view === "topics" ? (
           <TopicPanel topics={topics} />
         ) : view === "ask" ? (
           <AskPanel
@@ -604,7 +622,10 @@ function assertNever(value: never): never {
   throw new Error(`Unhandled state: ${String(value)}`);
 }
 
-function currentView(): "ask" | "inbox" | "settings" | "topics" {
+function currentView(): "ask" | "inbox" | "library" | "settings" | "topics" {
+  if (window.location.hash === "#library") {
+    return "library";
+  }
   if (window.location.hash === "#topics") {
     return "topics";
   }

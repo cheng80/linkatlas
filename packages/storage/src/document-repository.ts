@@ -57,11 +57,16 @@ export type DocumentSnapshot = {
   readonly blocks: readonly ContentBlock[];
 };
 
+export type ListRecentDocumentsInput = {
+  readonly limit: number;
+};
+
 export type SaveDocumentSnapshotInput = DocumentSnapshot;
 
 export interface DocumentRepository {
   saveDocumentSnapshot(input: SaveDocumentSnapshotInput): void;
   getDocumentSnapshot(documentId: DocumentId): DocumentSnapshot | null;
+  listRecent(input: ListRecentDocumentsInput): readonly Document[];
 }
 
 export function createSqliteDocumentRepository(database: LinkAtlasDatabase): DocumentRepository {
@@ -215,6 +220,20 @@ order by ordinal asc
         .map(parseContentBlock);
 
       return { document, version, blocks };
+    },
+
+    listRecent(input: ListRecentDocumentsInput): readonly Document[] {
+      return database
+        .prepare<{ readonly limit: number }>(
+          `
+select id, original_url, title, status, created_at, updated_at
+from documents
+order by updated_at desc
+limit @limit
+`,
+        )
+        .all({ limit: input.limit })
+        .map(parseDocument);
     },
   };
 }

@@ -10,12 +10,22 @@ describe("preload API contract", () => {
       "ingest",
       "jobs",
       "knowledge",
+      "library",
       "models",
       "search",
     ] satisfies readonly (keyof LinkAtlasApi)[];
     const forbiddenKeys = ["execute", "readFile", "writeFile", "querySql", "ipcRenderer"];
 
-    expect(exposedKeys).toEqual(["app", "ask", "ingest", "jobs", "knowledge", "models", "search"]);
+    expect(exposedKeys).toEqual([
+      "app",
+      "ask",
+      "ingest",
+      "jobs",
+      "knowledge",
+      "library",
+      "models",
+      "search",
+    ]);
     expect(forbiddenKeys).not.toContain("app");
   });
 });

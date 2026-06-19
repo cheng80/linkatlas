@@ -78,6 +78,7 @@ function inMemoryDocumentRepository(): DocumentRepository {
   const snapshots = new Map<string, Parameters<DocumentRepository["saveDocumentSnapshot"]>[0]>();
   return {
     getDocumentSnapshot: (documentId) => snapshots.get(documentId) ?? null,
+    listRecent: () => Array.from(snapshots.values()).map((snapshot) => snapshot.document),
     saveDocumentSnapshot: (input) => {
       snapshots.set(input.document.id, input);
     },

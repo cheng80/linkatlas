@@ -37,6 +37,10 @@ test("desktop smoke renders shell through typed preload API", async () => {
     await expect(window.getByText("INVALID_INPUT")).toBeVisible();
     await expect(window.getByRole("button", { name: "재시도" })).toBeEnabled();
 
+    await window.getByRole("link", { name: "Library" }).click();
+    await expect(window.getByRole("heading", { name: "Library" })).toBeVisible();
+    await expect(window.getByText("아직 저장된 자료가 없습니다.")).toBeVisible();
+
     const nodeGlobals = await window.evaluate(() => ({
       hasProcess: "process" in globalThis,
       hasRequire: "require" in globalThis,

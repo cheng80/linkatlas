@@ -8,6 +8,7 @@ import type {
   JobCommandRequestDto,
   JobCommandResultDto,
   ListJobsResultDto,
+  ListLibraryDocumentsResultDto,
   ListModelsResultDto,
   ListRelatedDocumentsRequestDto,
   ListRelatedDocumentsResultDto,
@@ -25,6 +26,7 @@ export const linkAtlasIpcChannels = {
   cancelJob: "linkAtlas:jobs:cancel",
   ingestUrl: "linkAtlas:ingestUrl",
   listJobs: "linkAtlas:jobs:list",
+  listLibraryDocuments: "linkAtlas:library:list",
   listModels: "linkAtlas:models:list",
   listRelatedDocuments: "linkAtlas:knowledge:related:list",
   listTopics: "linkAtlas:knowledge:topics:list",
@@ -60,6 +62,9 @@ export type LinkAtlasApi = {
     readonly removeRelation: (
       input: RelationCommandRequestDto,
     ) => Promise<RelationCommandResultDto>;
+  };
+  readonly library: {
+    readonly list: () => Promise<ListLibraryDocumentsResultDto>;
   };
   readonly models: {
     readonly health: () => Promise<ProviderHealthDto>;

@@ -50,6 +50,11 @@ const api: LinkAtlasApi = {
       return await electron.ipcRenderer.invoke("linkAtlas:knowledge:relation:remove", input);
     },
   },
+  library: {
+    list: async () => {
+      return await electron.ipcRenderer.invoke("linkAtlas:library:list");
+    },
+  },
   models: {
     health: async () => {
       return await electron.ipcRenderer.invoke("linkAtlas:models:health");

@@ -5,11 +5,13 @@ import { createIngestUrlHandler } from "./ingest-ipc.js";
 
 const repository: DocumentRepository = {
   getDocumentSnapshot: () => null,
+  listRecent: () => [],
   saveDocumentSnapshot: () => undefined,
 };
 const queuedJob: Job = {
   id: "job_test",
   documentId: null,
+  idempotencyKey: "ingest-url:https://example.com",
   status: JobStatus.Queued,
   stage: "stage_fetching",
   progress: 0,

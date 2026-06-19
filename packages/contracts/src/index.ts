@@ -84,6 +84,8 @@ export {
   RelationCommandResultSchema,
   TopicDtoSchema,
 } from "./knowledge.js";
+export type { LibraryDocumentDto, ListLibraryDocumentsResultDto } from "./library.js";
+export { LibraryDocumentDtoSchema, ListLibraryDocumentsResultSchema } from "./library.js";
 export type { ListModelsResultDto, ModelInfoDto, ProviderHealthDto } from "./models.js";
 export { ListModelsResultSchema, ModelInfoDtoSchema, ProviderHealthDtoSchema } from "./models.js";
 export type { SearchQueryDto, SearchResultDto } from "./search.js";

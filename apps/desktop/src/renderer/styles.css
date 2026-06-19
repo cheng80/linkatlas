@@ -525,6 +525,53 @@ button:disabled {
   overflow-wrap: anywhere;
 }
 
+.library-grid {
+  display: grid;
+  gap: 12px;
+  max-width: 760px;
+}
+
+.library-list-card {
+  background: #ffffff;
+  border: 1px solid #d7dde2;
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+}
+
+.library-list-card div {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.library-list-card h3 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.library-list-card span {
+  background: #e6f2ec;
+  border-radius: 6px;
+  color: #1f5b3d;
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 7px;
+}
+
+.library-list-card a {
+  color: #245c73;
+  overflow-wrap: anywhere;
+}
+
+.library-list-card small,
+.empty-state {
+  color: #66727d;
+}
+
 .summary-card ul {
   display: grid;
   gap: 8px;
