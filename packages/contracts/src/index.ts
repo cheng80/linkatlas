@@ -15,6 +15,18 @@ export {
   AskStreamEventSchema,
   parseAskQuestionRequest,
 } from "./ask.js";
+export type {
+  BrowserCaptureKindDto,
+  BrowserCaptureRequestDto,
+  BrowserCaptureResponseDto,
+} from "./browser-capture.js";
+export {
+  BrowserCaptureKindSchema,
+  BrowserCaptureRequestSchema,
+  BrowserCaptureResponseSchema,
+  parseBrowserCaptureRequest,
+  parseBrowserCaptureResponse,
+} from "./browser-capture.js";
 export type { ContractErrorCode, ContractErrorDto } from "./errors.js";
 export {
   ContractErrorCodeSchema,

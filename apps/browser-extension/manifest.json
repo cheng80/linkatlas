@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "LinkAtlas Capture",
+  "version": "0.1.0",
+  "description": "Save the current page or selected text to LinkAtlas.",
+  "permissions": ["activeTab", "nativeMessaging", "scripting"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Save to LinkAtlas"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
