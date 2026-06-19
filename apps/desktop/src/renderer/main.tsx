@@ -1,4 +1,4 @@
-import type { DocumentSummaryDto, JobDto } from "@linkatlas/contracts";
+import type { DocumentSummaryDto, JobDto, SearchResultDto } from "@linkatlas/contracts";
 import { StrictMode, useCallback, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 
@@ -34,6 +34,8 @@ function App(): React.JSX.Element {
   const [versionState, setVersionState] = useState<AppVersionState>({ kind: "loading" });
   const [ollamaState, setOllamaState] = useState<OllamaStatusState>({ kind: "checking" });
   const [url, setUrl] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<readonly SearchResultDto[]>([]);
   const [ingestState, setIngestState] = useState<IngestState>({ kind: "idle" });
   const [jobs, setJobs] = useState<readonly JobDto[]>([]);
 
@@ -142,6 +144,15 @@ function App(): React.JSX.Element {
     await refreshJobs();
   }
 
+  async function submitSearch(event: React.FormEvent<HTMLFormElement>): Promise<void> {
+    event.preventDefault();
+    if (searchQuery.trim().length === 0) {
+      setSearchResults([]);
+      return;
+    }
+    setSearchResults(await window.linkAtlas.search.query({ query: searchQuery, limit: 8 }));
+  }
+
   return (
     <main className="shell">
       <aside className="sidebar" aria-label="LinkAtlas navigation">
@@ -172,10 +183,17 @@ function App(): React.JSX.Element {
               URL 저장
             </button>
           </form>
-          <label className="search-entry">
-            <span>Search</span>
-            <input type="search" placeholder="저장된 자료 검색" disabled />
-          </label>
+          <form className="search-entry" onSubmit={submitSearch}>
+            <label>
+              <span>Search</span>
+              <input
+                type="search"
+                placeholder="저장된 자료 검색"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.currentTarget.value)}
+              />
+            </label>
+          </form>
           <div className="model-status" data-testid="app-version">
             {renderVersion(versionState)}
           </div>
@@ -193,6 +211,19 @@ function App(): React.JSX.Element {
           {ingestState.kind === "accepted" ? <LibraryCard state={ingestState} /> : null}
           {ingestState.kind === "accepted" && ingestState.summary !== null ? (
             <SummaryCard summary={ingestState.summary} />
+          ) : null}
+          {searchResults.length > 0 ? (
+            <section className="search-results" aria-label="Search results">
+              <p className="eyebrow">Search results</p>
+              <ul>
+                {searchResults.map((result) => (
+                  <li key={result.chunkId}>
+                    <strong>{result.headingPath.join(" > ") || result.documentId}</strong>
+                    <span>{result.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
           ) : null}
           <JobList jobs={jobs} onCancel={cancelJob} onRetry={retryJob} />
         </section>

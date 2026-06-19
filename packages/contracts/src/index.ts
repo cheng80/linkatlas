@@ -39,3 +39,5 @@ export {
 } from "./jobs.js";
 export type { ListModelsResultDto, ModelInfoDto, ProviderHealthDto } from "./models.js";
 export { ListModelsResultSchema, ModelInfoDtoSchema, ProviderHealthDtoSchema } from "./models.js";
+export type { SearchQueryDto, SearchResultDto } from "./search.js";
+export { parseSearchQuery, SearchQuerySchema, SearchResultSchema } from "./search.js";

@@ -75,7 +75,7 @@ input {
 }
 
 .url-entry label,
-.search-entry {
+.search-entry label {
   display: grid;
   gap: 6px;
 }
@@ -101,6 +101,36 @@ input {
   border-radius: 8px;
   min-height: 40px;
   padding: 0 12px;
+}
+
+.search-results {
+  border-top: 1px solid #d7dde2;
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  max-width: 760px;
+  padding-top: 18px;
+}
+
+.search-results ul {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.search-results li {
+  background: #ffffff;
+  border: 1px solid #d7dde2;
+  border-radius: 8px;
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+}
+
+.search-results li span {
+  color: #465560;
 }
 
 button {

@@ -10,7 +10,12 @@ import type {
 import { AppErrorCode, DocumentStatus, JobStatus } from "@linkatlas/domain";
 import type { ExtractedArticleBlock } from "@linkatlas/ingestion";
 import { extractArticle, FetchError, FetchErrorCode, fetchHtml } from "@linkatlas/ingestion";
-import type { DocumentRepository, JobRepository, SummaryRepository } from "@linkatlas/storage";
+import type {
+  ChunkRepository,
+  DocumentRepository,
+  JobRepository,
+  SummaryRepository,
+} from "@linkatlas/storage";
 import { ipcMain } from "electron";
 import { maybeAnalyzeDocument } from "./analysis-summary.js";
 
@@ -18,6 +23,7 @@ export type IngestUrlHandlerOptions = {
   readonly allowedHosts: readonly string[];
   readonly documentRepository: DocumentRepository;
   readonly jobRepository: JobRepository;
+  readonly chunkRepository?: ChunkRepository;
   readonly summaryRepository?: SummaryRepository;
   readonly generationProvider?: GenerationProvider;
   readonly analysisModel?: string;
@@ -119,6 +125,10 @@ export function createIngestUrlHandler(
         stage: "stage_storing",
       });
       options.documentRepository.saveDocumentSnapshot({ document, version, blocks });
+      options.chunkRepository?.rebuildDocumentChunks({
+        now,
+        snapshot: { blocks, document, version },
+      });
       const summary = await maybeAnalyzeDocument({
         blocks,
         documentId,

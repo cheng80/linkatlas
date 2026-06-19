@@ -2,6 +2,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { OllamaGenerationProvider } from "@linkatlas/llm";
 import {
+  createSqliteChunkRepository,
   createSqliteConnection,
   createSqliteDocumentRepository,
   createSqliteJobRepository,
@@ -14,6 +15,7 @@ import { app, BrowserWindow } from "electron";
 import { registerIngestIpc } from "./ingest-ipc.js";
 import { registerJobIpc } from "./job-ipc.js";
 import { registerModelIpc } from "./model-ipc.js";
+import { registerSearchIpc } from "./search-ipc.js";
 import { createSecureWebPreferences, isAllowedNavigation } from "./security.js";
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url));
@@ -55,6 +57,7 @@ export function createMainWindow(): BrowserWindow {
 app.whenReady().then(() => {
   const database = createAppDatabase();
   const jobRepository = createSqliteJobRepository(database);
+  const chunkRepository = createSqliteChunkRepository(database);
   const generationProvider = new OllamaGenerationProvider({
     baseUrl: process.env[ollamaBaseUrlKey] ?? "http://127.0.0.1:11434",
     timeoutMs: 1_000,
@@ -62,6 +65,7 @@ app.whenReady().then(() => {
   registerIngestIpc({
     allowedHosts: allowedFetchHosts(),
     analysisModel: "gemma4:12b",
+    chunkRepository,
     documentRepository: createSqliteDocumentRepository(database),
     generationProvider,
     jobRepository,
@@ -71,6 +75,7 @@ app.whenReady().then(() => {
   registerModelIpc({
     generationProvider,
   });
+  registerSearchIpc({ chunkRepository });
   app.once("before-quit", () => {
     database.close();
   });

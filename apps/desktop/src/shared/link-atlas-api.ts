@@ -7,6 +7,8 @@ import type {
   ListJobsResultDto,
   ListModelsResultDto,
   ProviderHealthDto,
+  SearchQueryDto,
+  SearchResultDto,
 } from "@linkatlas/contracts";
 
 export const linkAtlasIpcChannels = {
@@ -16,6 +18,7 @@ export const linkAtlasIpcChannels = {
   listModels: "linkAtlas:models:list",
   modelHealth: "linkAtlas:models:health",
   retryJob: "linkAtlas:jobs:retry",
+  search: "linkAtlas:search:query",
 } as const;
 
 export type LinkAtlasApi = {
@@ -33,5 +36,8 @@ export type LinkAtlasApi = {
   readonly models: {
     readonly health: () => Promise<ProviderHealthDto>;
     readonly list: () => Promise<ListModelsResultDto>;
+  };
+  readonly search: {
+    readonly query: (input: SearchQueryDto) => Promise<readonly SearchResultDto[]>;
   };
 };

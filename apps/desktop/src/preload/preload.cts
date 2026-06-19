@@ -30,6 +30,11 @@ const api: LinkAtlasApi = {
       return await electron.ipcRenderer.invoke("linkAtlas:models:list");
     },
   },
+  search: {
+    query: async (input) => {
+      return await electron.ipcRenderer.invoke("linkAtlas:search:query", input);
+    },
+  },
 };
 
 function appVersion(): string {
