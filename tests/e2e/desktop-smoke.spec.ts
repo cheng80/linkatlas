@@ -26,17 +26,13 @@ test("desktop smoke renders shell through typed preload API", async () => {
     await expect(window.getByRole("button", { name: "URL 저장" })).toBeEnabled();
     await window.getByRole("button", { name: "URL 저장" }).click();
     await expect(window.getByText("로컬 또는 사설 네트워크 URL은 기본 차단됩니다.")).toBeVisible();
-    await expect(
-      window.getByRole("region", { name: "Recent jobs" }).getByText("실패"),
-    ).toBeVisible();
-    await expect(
-      window.getByRole("region", { name: "Recent jobs" }).getByText("127.0.0.1/private"),
-    ).toBeVisible();
-    await expect(
-      window.getByRole("region", { name: "Recent jobs" }).getByText("http://127.0.0.1:1/private"),
-    ).toBeVisible();
+    const jobs = window.getByRole("region", { name: "Recent jobs" });
+    await expect(jobs.getByText("실패")).toBeVisible();
+    await expect(jobs.getByText("127.0.0.1/private")).toBeVisible();
+    await expect(jobs.getByText("http://127.0.0.1:1/private")).toBeVisible();
     await expect(window.getByText("INVALID_INPUT")).toBeVisible();
-    await expect(window.getByRole("button", { name: "재시도" })).toBeEnabled();
+    await expect(jobs.getByRole("button", { name: "재시도" })).toBeEnabled();
+    await expect(jobs.getByRole("button", { name: "취소" })).toHaveCount(0);
 
     await window.getByRole("link", { name: "Library" }).click();
     await expect(window.getByRole("heading", { name: "Library" })).toBeVisible();

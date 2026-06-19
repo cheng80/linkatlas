@@ -1,5 +1,11 @@
 import type { JobDto } from "@linkatlas/contracts";
 
+type JobActionProps = {
+  readonly job: JobDto;
+  readonly onCancel: (jobId: `job_${string}`) => Promise<void>;
+  readonly onRetry: (jobId: `job_${string}`) => Promise<void>;
+};
+
 export function JobList(props: {
   readonly jobs: readonly JobDto[];
   readonly onCancel: (jobId: `job_${string}`) => Promise<void>;
@@ -34,28 +40,45 @@ export function JobList(props: {
               <div className="job-progress">
                 <progress aria-label={`진행률 ${job.progress}%`} value={job.progress} max={100} />
               </div>
-              <div className="job-actions">
-                <button
-                  type="button"
-                  disabled={job.status !== "QUEUED" && job.status !== "RUNNING"}
-                  onClick={() => void onCancel(job.id)}
-                >
-                  취소
-                </button>
-                <button
-                  type="button"
-                  disabled={job.status !== "FAILED"}
-                  onClick={() => void onRetry(job.id)}
-                >
-                  재시도
-                </button>
-              </div>
+              <JobActions job={job} onCancel={onCancel} onRetry={onRetry} />
             </li>
           ))}
         </ul>
       )}
     </section>
   );
+}
+
+function JobActions(props: JobActionProps): React.JSX.Element {
+  const { job, onCancel, onRetry } = props;
+
+  switch (job.status) {
+    case "QUEUED":
+    case "RUNNING":
+      return (
+        <div className="job-actions">
+          <button type="button" onClick={() => void onCancel(job.id)}>
+            취소
+          </button>
+        </div>
+      );
+    case "FAILED":
+      return (
+        <div className="job-actions">
+          <button type="button" onClick={() => void onRetry(job.id)}>
+            재시도
+          </button>
+        </div>
+      );
+    case "BLOCKED":
+      return <p className="job-terminal-note">처리 대기</p>;
+    case "COMPLETED":
+      return <p className="job-terminal-note">작업 완료</p>;
+    case "CANCELLED":
+      return <p className="job-terminal-note">취소됨</p>;
+    default:
+      return assertNever(job.status);
+  }
 }
 
 function jobTitle(job: JobDto): string {

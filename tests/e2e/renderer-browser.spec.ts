@@ -4,6 +4,11 @@ test("browser dev renderer supports Library navigation with mock preload API", a
   await page.goto("/");
 
   await expect(page.getByRole("heading", { name: "LinkAtlas" })).toBeVisible();
+  const jobs = page.getByRole("region", { name: "Recent jobs" });
+  await expect(jobs.getByText("작업 완료")).toBeVisible();
+  await expect(jobs.getByRole("button", { name: "취소" })).toHaveCount(0);
+  await expect(jobs.getByRole("button", { name: "재시도" })).toHaveCount(0);
+
   await page.getByRole("link", { name: "Library" }).click();
 
   await expect(page).toHaveURL(/#library$/u);

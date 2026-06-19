@@ -720,6 +720,14 @@ button:disabled {
   padding: 0 10px;
 }
 
+.job-terminal-note {
+  color: #66727d;
+  font-size: 13px;
+  font-weight: 800;
+  margin: 0;
+  text-align: right;
+}
+
 @media (max-width: 760px) {
   .jobs-panel li {
     align-items: stretch;
