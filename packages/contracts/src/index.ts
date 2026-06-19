@@ -19,3 +19,18 @@ export {
   parseIngestUrlRequest,
   parseIngestUrlResult,
 } from "./ingest-url.js";
+export type {
+  JobCommandRequestDto,
+  JobCommandResultDto,
+  JobDto,
+  JobStatusDto,
+  ListJobsResultDto,
+} from "./jobs.js";
+export {
+  JobCommandRequestSchema,
+  JobCommandResultSchema,
+  JobDtoSchema,
+  JobStatusSchema,
+  ListJobsResultSchema,
+  parseJobCommandRequest,
+} from "./jobs.js";

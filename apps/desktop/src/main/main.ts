@@ -10,11 +10,18 @@ import {
 import { app, BrowserWindow } from "electron";
 
 import { registerIngestIpc } from "./ingest-ipc.js";
+import { registerJobIpc } from "./job-ipc.js";
 import { createSecureWebPreferences, isAllowedNavigation } from "./security.js";
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url));
 const e2eEnvironmentKey = "LINKATLAS_E2E";
+const e2eUserDataDirectoryKey = "LINKATLAS_E2E_USER_DATA_DIR";
 const allowedFetchHostsKey = "LINKATLAS_ALLOWED_FETCH_HOSTS";
+
+const e2eUserDataDirectory = process.env[e2eUserDataDirectoryKey];
+if (e2eUserDataDirectory !== undefined && e2eUserDataDirectory.trim().length > 0) {
+  app.setPath("userData", e2eUserDataDirectory);
+}
 
 export function createMainWindow(): BrowserWindow {
   const preloadPath = join(currentDirectory, "../preload/preload.cjs");
@@ -43,11 +50,13 @@ export function createMainWindow(): BrowserWindow {
 
 app.whenReady().then(() => {
   const database = createAppDatabase();
+  const jobRepository = createSqliteJobRepository(database);
   registerIngestIpc({
     allowedHosts: allowedFetchHosts(),
     documentRepository: createSqliteDocumentRepository(database),
-    jobRepository: createSqliteJobRepository(database),
+    jobRepository,
   });
+  registerJobIpc({ jobRepository });
   app.once("before-quit", () => {
     database.close();
   });

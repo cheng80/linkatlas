@@ -231,3 +231,73 @@ button:disabled {
   color: #245c73;
   overflow-wrap: anywhere;
 }
+
+.jobs-panel {
+  border-top: 1px solid #d7dde2;
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  max-width: 760px;
+  padding-top: 18px;
+}
+
+.jobs-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.jobs-header span {
+  color: #66727d;
+  font-weight: 800;
+}
+
+.jobs-panel ul {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.jobs-panel li {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #d7dde2;
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(150px, 1fr) minmax(120px, 0.8fr) auto;
+  padding: 12px;
+}
+
+.jobs-panel li div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.jobs-panel strong {
+  color: #172026;
+  font-size: 14px;
+}
+
+.jobs-panel li span {
+  color: #66727d;
+  font-size: 13px;
+}
+
+.jobs-panel progress {
+  accent-color: #245c73;
+  inline-size: 100%;
+}
+
+.job-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.job-actions button {
+  font-size: 13px;
+  min-height: 32px;
+  padding: 0 10px;
+}

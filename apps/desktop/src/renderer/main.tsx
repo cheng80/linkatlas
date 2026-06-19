@@ -1,6 +1,9 @@
-import { StrictMode, useEffect, useState } from "react";
+import type { JobDto } from "@linkatlas/contracts";
+import { StrictMode, useCallback, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 
+import { JobList } from "./job-list.js";
+import { LibraryCard } from "./library-card.js";
 import "./styles.css";
 
 type IngestState =
@@ -26,6 +29,7 @@ function App(): React.JSX.Element {
   const [versionState, setVersionState] = useState<AppVersionState>({ kind: "loading" });
   const [url, setUrl] = useState("");
   const [ingestState, setIngestState] = useState<IngestState>({ kind: "idle" });
+  const [jobs, setJobs] = useState<readonly JobDto[]>([]);
 
   useEffect(() => {
     let active = true;
@@ -51,6 +55,15 @@ function App(): React.JSX.Element {
     };
   }, []);
 
+  const refreshJobs = useCallback(async (): Promise<void> => {
+    const result = await window.linkAtlas.jobs.list();
+    setJobs(result.jobs);
+  }, []);
+
+  useEffect(() => {
+    void refreshJobs();
+  }, [refreshJobs]);
+
   async function submitUrl(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
     setIngestState({ kind: "submitting" });
@@ -66,10 +79,22 @@ function App(): React.JSX.Element {
         excerpt: result.excerpt,
         language: result.language,
       });
+      await refreshJobs();
       return;
     }
 
     setIngestState({ kind: "rejected", message: result.message });
+    await refreshJobs();
+  }
+
+  async function cancelJob(jobId: `job_${string}`): Promise<void> {
+    await window.linkAtlas.jobs.cancel({ jobId });
+    await refreshJobs();
+  }
+
+  async function retryJob(jobId: `job_${string}`): Promise<void> {
+    await window.linkAtlas.jobs.retry({ jobId });
+    await refreshJobs();
   }
 
   return (
@@ -120,39 +145,10 @@ function App(): React.JSX.Element {
             {renderIngestState(ingestState)}
           </p>
           {ingestState.kind === "accepted" ? <LibraryCard state={ingestState} /> : null}
+          <JobList jobs={jobs} onCancel={cancelJob} onRetry={retryJob} />
         </section>
       </section>
     </main>
-  );
-}
-
-function LibraryCard(props: {
-  readonly state: Extract<IngestState, { readonly kind: "accepted" }>;
-}): React.JSX.Element {
-  const { state } = props;
-  return (
-    <article className="library-card" aria-label="Saved library item">
-      <div>
-        <p className="eyebrow">Library</p>
-        <h3>{state.title}</h3>
-      </div>
-      <p>{state.excerpt ?? "요약 가능한 본문이 저장되었습니다."}</p>
-      <dl>
-        <div>
-          <dt>Job</dt>
-          <dd>{state.jobStatus}</dd>
-        </div>
-        <div>
-          <dt>Blocks</dt>
-          <dd>{state.blockCount}</dd>
-        </div>
-        <div>
-          <dt>Language</dt>
-          <dd>{state.language ?? "unknown"}</dd>
-        </div>
-      </dl>
-      <a href={state.finalUrl}>{state.finalUrl}</a>
-    </article>
   );
 }
 

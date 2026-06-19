@@ -11,6 +11,17 @@ const api: LinkAtlasApi = {
       return await electron.ipcRenderer.invoke("linkAtlas:ingestUrl", input);
     },
   },
+  jobs: {
+    cancel: async (input) => {
+      return await electron.ipcRenderer.invoke("linkAtlas:jobs:cancel", input);
+    },
+    list: async () => {
+      return await electron.ipcRenderer.invoke("linkAtlas:jobs:list");
+    },
+    retry: async (input) => {
+      return await electron.ipcRenderer.invoke("linkAtlas:jobs:retry", input);
+    },
+  },
 };
 
 function appVersion(): string {
