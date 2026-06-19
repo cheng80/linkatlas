@@ -18,13 +18,7 @@
         "surface": "cli",
         "invocation": "pnpm lint && pnpm typecheck && pnpm test && pnpm test:integration && pnpm test:e2e",
         "verdict": "passed",
-        "artifactRefs": [
-          "lint-log",
-          "typecheck-log",
-          "unit-log",
-          "integration-log",
-          "e2e-log"
-        ]
+        "artifactRefs": ["lint-log", "typecheck-log", "unit-log", "integration-log", "e2e-log"]
       },
       {
         "id": "surface-cli-manual-smoke",
@@ -32,10 +26,7 @@
         "surface": "cli",
         "invocation": "Playwright Electron manual smoke script against apps/desktop/dist/main/main.js",
         "verdict": "passed",
-        "artifactRefs": [
-          "manual-smoke-log",
-          "cleanup-log"
-        ]
+        "artifactRefs": ["manual-smoke-log", "cleanup-log"]
       }
     ],
     "adversarialCases": [
@@ -45,10 +36,7 @@
         "scenario": "Renderer, domain, and preload source must not bypass Electron security boundaries or expose generic privileged APIs.",
         "expectedBehavior": "Boundary tests pass and fail closed by scanning forbidden imports/API names; Electron unit tests assert nodeIntegration false, contextIsolation true, sandbox true.",
         "verdict": "passed",
-        "artifactRefs": [
-          "lint-log",
-          "security-boundaries-summary"
-        ]
+        "artifactRefs": ["lint-log", "security-boundaries-summary"]
       }
     ],
     "artifactRefs": [

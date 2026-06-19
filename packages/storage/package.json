@@ -1,0 +1,20 @@
+{
+  "name": "@linkatlas/storage",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest --root ../.. run packages/storage/src"
+  },
+  "dependencies": {
+    "@linkatlas/domain": "workspace:*",
+    "better-sqlite3": "^12.11.1",
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13"
+  }
+}
