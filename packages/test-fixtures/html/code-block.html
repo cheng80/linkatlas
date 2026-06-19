@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Queue Worker Example</title>
+  </head>
+  <body>
+    <article>
+      <h1>Queue Worker Example</h1>
+      <p>A durable job should be idempotent and cancellable.</p>
+      <pre><code>export async function run(signal: AbortSignal): Promise&lt;void&gt; {
+  signal.throwIfAborted();
+}</code></pre>
+    </article>
+  </body>
+</html>

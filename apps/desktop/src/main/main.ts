@@ -1,5 +1,11 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  createSqliteConnection,
+  createSqliteDocumentRepository,
+  type LinkAtlasDatabase,
+  migrateDatabase,
+} from "@linkatlas/storage";
 import { app, BrowserWindow } from "electron";
 
 import { registerIngestIpc } from "./ingest-ipc.js";
@@ -35,7 +41,14 @@ export function createMainWindow(): BrowserWindow {
 }
 
 app.whenReady().then(() => {
-  registerIngestIpc({ allowedHosts: allowedFetchHosts() });
+  const database = createAppDatabase();
+  registerIngestIpc({
+    allowedHosts: allowedFetchHosts(),
+    documentRepository: createSqliteDocumentRepository(database),
+  });
+  app.once("before-quit", () => {
+    database.close();
+  });
   createMainWindow();
 
   app.on("activate", () => {
@@ -60,4 +73,12 @@ function allowedFetchHosts(): readonly string[] {
     .split(",")
     .map((host) => host.trim())
     .filter((host) => host.length > 0);
+}
+
+function createAppDatabase(): LinkAtlasDatabase {
+  const database = createSqliteConnection({
+    databasePath: join(app.getPath("userData"), "vault.sqlite3"),
+  });
+  migrateDatabase(database);
+  return database;
 }

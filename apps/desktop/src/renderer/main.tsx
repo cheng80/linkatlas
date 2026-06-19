@@ -6,7 +6,14 @@ import "./styles.css";
 type IngestState =
   | { readonly kind: "idle" }
   | { readonly kind: "submitting" }
-  | { readonly kind: "accepted"; readonly title: string; readonly finalUrl: string }
+  | {
+      readonly kind: "accepted";
+      readonly title: string;
+      readonly finalUrl: string;
+      readonly blockCount: number;
+      readonly excerpt: string | null;
+      readonly language: string | null;
+    }
   | { readonly kind: "rejected"; readonly message: string };
 
 type AppVersionState =
@@ -49,7 +56,14 @@ function App(): React.JSX.Element {
 
     const result = await window.linkAtlas.ingest.addUrl({ url });
     if (result.ok) {
-      setIngestState({ kind: "accepted", title: result.title, finalUrl: result.finalUrl });
+      setIngestState({
+        kind: "accepted",
+        title: result.title,
+        finalUrl: result.finalUrl,
+        blockCount: result.blockCount,
+        excerpt: result.excerpt,
+        language: result.language,
+      });
       return;
     }
 
@@ -96,16 +110,43 @@ function App(): React.JSX.Element {
         </header>
         <section className="inbox-panel">
           <p className="eyebrow">Local-first knowledge base</p>
-          <h2 id="workspace-title">Inbox 준비 중</h2>
-          <p>URL 수집, 본문 추출, 요약, 검색을 위한 안전한 데스크톱 셸이 준비되었습니다.</p>
+          <h2 id="workspace-title">Inbox</h2>
+          <p>URL을 저장하면 정제된 본문 블록이 로컬 Vault에 추가됩니다.</p>
           <p
             className={ingestState.kind === "rejected" ? "ingest-message error" : "ingest-message"}
           >
             {renderIngestState(ingestState)}
           </p>
+          {ingestState.kind === "accepted" ? <LibraryCard state={ingestState} /> : null}
         </section>
       </section>
     </main>
+  );
+}
+
+function LibraryCard(props: {
+  readonly state: Extract<IngestState, { readonly kind: "accepted" }>;
+}): React.JSX.Element {
+  const { state } = props;
+  return (
+    <article className="library-card" aria-label="Saved library item">
+      <div>
+        <p className="eyebrow">Library</p>
+        <h3>{state.title}</h3>
+      </div>
+      <p>{state.excerpt ?? "요약 가능한 본문이 저장되었습니다."}</p>
+      <dl>
+        <div>
+          <dt>Blocks</dt>
+          <dd>{state.blockCount}</dd>
+        </div>
+        <div>
+          <dt>Language</dt>
+          <dd>{state.language ?? "unknown"}</dd>
+        </div>
+      </dl>
+      <a href={state.finalUrl}>{state.finalUrl}</a>
+    </article>
   );
 }
 
@@ -116,7 +157,7 @@ function renderIngestState(state: IngestState): string {
     case "submitting":
       return "URL을 검증하고 가져오는 중입니다.";
     case "accepted":
-      return `${state.title} 가져오기 완료: ${state.finalUrl}`;
+      return `${state.title} 본문 추출 및 저장 완료`;
     case "rejected":
       return state.message;
     default:

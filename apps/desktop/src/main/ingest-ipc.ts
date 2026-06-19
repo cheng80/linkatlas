@@ -1,10 +1,17 @@
+import { createHash } from "node:crypto";
 import type { IngestUrlRequestDto, IngestUrlResultDto } from "@linkatlas/contracts";
 import { parseIngestUrlRequest } from "@linkatlas/contracts";
-import { FetchError, FetchErrorCode, fetchHtml } from "@linkatlas/ingestion";
+import type { ContentBlock, Document, DocumentVersion } from "@linkatlas/domain";
+import { DocumentStatus } from "@linkatlas/domain";
+import type { ExtractedArticleBlock } from "@linkatlas/ingestion";
+import { extractArticle, FetchError, FetchErrorCode, fetchHtml } from "@linkatlas/ingestion";
+import type { DocumentRepository } from "@linkatlas/storage";
 import { ipcMain } from "electron";
 
 export type IngestUrlHandlerOptions = {
   readonly allowedHosts: readonly string[];
+  readonly documentRepository: DocumentRepository;
+  readonly now?: () => Date;
 };
 
 const ingestUrlChannel = "linkAtlas:ingestUrl";
@@ -40,12 +47,38 @@ export function createIngestUrlHandler(
           timeoutMs: 10_000,
         },
       });
+      const article = extractArticle({ html: fetched.html, url: fetched.finalUrl });
+      const now = options.now?.() ?? new Date();
+      const documentId = documentIdForUrl(fetched.finalUrl);
+      const versionId = documentVersionIdForHash(article.contentHash);
+
+      const document: Document = {
+        id: documentId,
+        originalUrl: request.url,
+        title: article.title,
+        status: DocumentStatus.Ready,
+        createdAt: now,
+        updatedAt: now,
+      };
+      const version: DocumentVersion = {
+        id: versionId,
+        documentId,
+        contentHash: article.contentHash,
+        createdAt: now,
+      };
+      const blocks = article.blocks.map((block): ContentBlock => toContentBlock(versionId, block));
+
+      options.documentRepository.saveDocumentSnapshot({ document, version, blocks });
 
       return {
         ok: true,
+        documentId,
         finalUrl: fetched.finalUrl,
-        title: extractTitle(fetched.html),
+        title: article.title,
         byteLength: Buffer.byteLength(fetched.html),
+        blockCount: blocks.length,
+        excerpt: article.excerpt,
+        language: article.language,
       };
     } catch (error) {
       if (error instanceof FetchError) {
@@ -63,12 +96,6 @@ export function createIngestUrlHandler(
       };
     }
   };
-}
-
-function extractTitle(html: string): string {
-  const match = /<title[^>]*>([^<]*)<\/title>/i.exec(html);
-  const title = match?.[1]?.trim();
-  return title === undefined || title.length === 0 ? "Untitled" : title;
 }
 
 function userMessageForFetchError(errorCode: FetchErrorCode): string {
@@ -90,6 +117,32 @@ function userMessageForFetchError(errorCode: FetchErrorCode): string {
     default:
       return assertNever(errorCode);
   }
+}
+
+function documentIdForUrl(url: string): `doc_${string}` {
+  return `doc_${sha256(url).slice(0, 24)}`;
+}
+
+function documentVersionIdForHash(contentHash: string): `docver_${string}` {
+  return `docver_${sha256(contentHash).slice(0, 24)}`;
+}
+
+function toContentBlock(
+  documentVersionId: `docver_${string}`,
+  block: ExtractedArticleBlock,
+): ContentBlock {
+  return {
+    id: `block_${sha256(`${documentVersionId}\0${block.id}`).slice(0, 24)}`,
+    documentVersionId,
+    ordinal: block.ordinal,
+    blockType: block.blockType,
+    text: block.text,
+    headingPath: block.headingPath,
+  };
+}
+
+function sha256(value: string): string {
+  return createHash("sha256").update(value).digest("hex");
 }
 
 function assertNever(value: never): never {

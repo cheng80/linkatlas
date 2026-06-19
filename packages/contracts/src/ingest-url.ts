@@ -24,9 +24,13 @@ export type IngestUrlErrorCode = z.infer<typeof IngestUrlErrorCodeSchema>;
 export const IngestUrlResultSchema = z.discriminatedUnion("ok", [
   z.object({
     ok: z.literal(true),
+    documentId: z.string().min(1),
     finalUrl: z.string().url(),
     title: z.string(),
     byteLength: z.number().int().nonnegative(),
+    blockCount: z.number().int().nonnegative(),
+    excerpt: z.string().nullable(),
+    language: z.string().nullable(),
   }),
   z.object({
     ok: z.literal(false),

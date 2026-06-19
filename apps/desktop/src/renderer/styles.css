@@ -156,7 +156,7 @@ button:disabled {
   margin: 0;
 }
 
-.inbox-panel p:last-child {
+.inbox-panel > p {
   color: #465560;
   font-size: 16px;
   line-height: 1.6;
@@ -173,4 +173,61 @@ button:disabled {
 
 .ingest-message.error {
   color: #9a3412;
+}
+
+.library-card {
+  background: #ffffff;
+  border: 1px solid #d7dde2;
+  border-radius: 8px;
+  display: grid;
+  gap: 14px;
+  margin-top: 12px;
+  max-width: 760px;
+  padding: 18px;
+}
+
+.library-card h3 {
+  color: #172026;
+  font-size: 20px;
+  letter-spacing: 0;
+  line-height: 1.25;
+  margin: 4px 0 0;
+}
+
+.library-card p {
+  color: #465560;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.library-card dl {
+  display: flex;
+  gap: 12px;
+  margin: 0;
+}
+
+.library-card dl div {
+  background: #f5f7f8;
+  border-radius: 8px;
+  min-width: 110px;
+  padding: 10px 12px;
+}
+
+.library-card dt {
+  color: #66727d;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.library-card dd {
+  color: #172026;
+  font-size: 15px;
+  font-weight: 800;
+  margin: 3px 0 0;
+}
+
+.library-card a {
+  color: #245c73;
+  overflow-wrap: anywhere;
 }

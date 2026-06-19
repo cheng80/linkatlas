@@ -10,6 +10,15 @@
     "test": "vitest --root ../.. run packages/ingestion/src"
   },
   "dependencies": {
+    "@mozilla/readability": "^0.6.0",
+    "jsdom": "^29.1.1",
+    "sanitize-html": "^2.17.5",
+    "turndown": "^7.2.4",
     "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^28.0.3",
+    "@types/sanitize-html": "^2.16.1",
+    "@types/turndown": "^5.0.6"
   }
 }
