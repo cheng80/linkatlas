@@ -9,7 +9,7 @@
 ### Codex 요청
 
 ```text
-AGENTS.md와 DESIGN.md를 읽어라.
+AGENTS.md와 docs/DESIGN.md를 읽어라.
 
 pnpm workspace 기반 LinkAtlas monorepo를 생성하라.
 Electron main/preload/React renderer가 분리된 apps/desktop을 만들고,
@@ -41,7 +41,7 @@ Vitest, ESLint, Prettier, TypeScript strict mode를 구성하고,
 ### Codex 요청
 
 ```text
-AGENTS.md, DESIGN.md의 데이터 모델 절을 읽어라.
+AGENTS.md, docs/DESIGN.md의 데이터 모델 절을 읽어라.
 
 packages/storage를 만들고 SQLite connection, migration runner,
 Document/DocumentVersion/ContentBlock repository를 구현하라.
