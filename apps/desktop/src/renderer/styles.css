@@ -572,6 +572,25 @@ button:disabled {
   color: #66727d;
 }
 
+.placeholder-panel {
+  background: #ffffff;
+  border: 1px solid #d7dde2;
+  border-radius: 8px;
+  display: grid;
+  gap: 6px;
+  margin-top: 18px;
+  max-width: 760px;
+  padding: 16px;
+}
+
+.placeholder-panel strong {
+  color: #172026;
+}
+
+.placeholder-panel span {
+  color: #66727d;
+}
+
 .summary-card ul {
   display: grid;
   gap: 8px;

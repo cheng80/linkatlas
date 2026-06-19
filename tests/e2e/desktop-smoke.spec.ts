@@ -1,6 +1,7 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import type { Page } from "@playwright/test";
 import { _electron as electron, expect, test } from "@playwright/test";
 
 test("desktop smoke renders shell through typed preload API", async () => {
@@ -41,6 +42,8 @@ test("desktop smoke renders shell through typed preload API", async () => {
     await expect(window.getByRole("heading", { name: "Library" })).toBeVisible();
     await expect(window.getByText("아직 저장된 자료가 없습니다.")).toBeVisible();
 
+    await verifyDesktopNavigation(window);
+
     const nodeGlobals = await window.evaluate(() => ({
       hasProcess: "process" in globalThis,
       hasRequire: "require" in globalThis,
@@ -52,3 +55,20 @@ test("desktop smoke renders shell through typed preload API", async () => {
     await rm(userDataDirectory, { force: true, recursive: true });
   }
 });
+
+async function verifyDesktopNavigation(window: Page): Promise<void> {
+  const menuItems = [
+    "Inbox",
+    "Library",
+    "Topics",
+    "Collections",
+    "Graph",
+    "Ask",
+    "Settings",
+  ] as const;
+
+  for (const item of menuItems) {
+    await window.getByRole("link", { name: item }).click();
+    await expect(window.getByRole("heading", { name: item })).toBeVisible();
+  }
+}

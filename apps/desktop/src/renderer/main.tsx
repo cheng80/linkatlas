@@ -347,6 +347,18 @@ function App(): React.JSX.Element {
           <LibraryPanel documents={libraryDocuments} />
         ) : view === "topics" ? (
           <TopicPanel topics={topics} />
+        ) : view === "collections" ? (
+          <PlaceholderPanel
+            eyebrow="Manual organization"
+            title="Collections"
+            body="사용자가 직접 자료 묶음을 만드는 화면입니다. 저장된 자료 선택과 컬렉션 편집 기능을 연결할 예정입니다."
+          />
+        ) : view === "graph" ? (
+          <PlaceholderPanel
+            eyebrow="Knowledge graph"
+            title="Graph"
+            body="문서, 주제, 엔티티 관계를 시각적으로 탐색하는 화면입니다. 관계 데이터가 쌓이면 그래프 탐색을 연결합니다."
+          />
         ) : view === "ask" ? (
           <AskPanel
             answer={askAnswer}
@@ -405,6 +417,26 @@ function App(): React.JSX.Element {
         )}
       </section>
     </main>
+  );
+}
+
+function PlaceholderPanel(input: {
+  readonly eyebrow: string;
+  readonly title: string;
+  readonly body: string;
+}): React.JSX.Element {
+  return (
+    <section className="inbox-panel">
+      <p className="eyebrow">{input.eyebrow}</p>
+      <h2 id="workspace-title">{input.title}</h2>
+      <p>{input.body}</p>
+      <div className="placeholder-panel">
+        <strong>준비 중</strong>
+        <span>
+          이 메뉴는 독립 화면으로 연결되어 있으며, 후속 기능 구현 전까지 안내 상태를 표시합니다.
+        </span>
+      </div>
+    </section>
   );
 }
 
@@ -622,7 +654,20 @@ function assertNever(value: never): never {
   throw new Error(`Unhandled state: ${String(value)}`);
 }
 
-function currentView(): "ask" | "inbox" | "library" | "settings" | "topics" {
+function currentView():
+  | "ask"
+  | "collections"
+  | "graph"
+  | "inbox"
+  | "library"
+  | "settings"
+  | "topics" {
+  if (window.location.hash === "#collections") {
+    return "collections";
+  }
+  if (window.location.hash === "#graph") {
+    return "graph";
+  }
   if (window.location.hash === "#library") {
     return "library";
   }

@@ -10,4 +10,19 @@ test("browser dev renderer supports Library navigation with mock preload API", a
   await expect(page.getByRole("heading", { name: "Library" })).toBeVisible();
   await expect(page.getByText("브라우저 dev 샘플")).toBeVisible();
   await expect(page.getByText("https://www.threads.com/@robin")).toBeVisible();
+
+  const menuItems = [
+    "Inbox",
+    "Library",
+    "Topics",
+    "Collections",
+    "Graph",
+    "Ask",
+    "Settings",
+  ] as const;
+
+  for (const item of menuItems) {
+    await page.getByRole("link", { name: item }).click();
+    await expect(page.getByRole("heading", { name: item })).toBeVisible();
+  }
 });
