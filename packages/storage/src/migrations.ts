@@ -106,4 +106,34 @@ CREATE UNIQUE INDEX idx_summaries_generated_version_kind
   WHERE is_user_edited = 0;
 `,
   },
+  {
+    id: "0004_chunks_search",
+    sql: `
+CREATE TABLE chunks (
+  id TEXT PRIMARY KEY,
+  document_id TEXT NOT NULL,
+  document_version_id TEXT NOT NULL,
+  ordinal INTEGER NOT NULL,
+  heading_path TEXT NOT NULL,
+  text TEXT NOT NULL,
+  block_ids_json TEXT NOT NULL,
+  embedding_index_version TEXT,
+  created_at TEXT NOT NULL,
+  FOREIGN KEY(document_id) REFERENCES documents(id) ON DELETE CASCADE,
+  FOREIGN KEY(document_version_id) REFERENCES document_versions(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_chunks_document_id ON chunks(document_id, ordinal);
+CREATE UNIQUE INDEX idx_chunks_version_ordinal ON chunks(document_version_id, ordinal);
+
+CREATE VIRTUAL TABLE chunk_fts USING fts5(
+  chunk_id UNINDEXED,
+  document_id UNINDEXED,
+  title,
+  heading_path,
+  body,
+  tokenize = 'unicode61'
+);
+`,
+  },
 ];

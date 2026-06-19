@@ -1,3 +1,5 @@
+export type { ChunkRecord, ChunkRepository, KeywordSearchHit } from "./chunk-repository.js";
+export { createSqliteChunkRepository } from "./chunk-repository.js";
 export type { LinkAtlasDatabase, SqliteConnectionOptions } from "./connection.js";
 export { createSqliteConnection, runInTransaction } from "./connection.js";
 export type {

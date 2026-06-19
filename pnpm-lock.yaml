@@ -124,6 +124,12 @@ importers:
         specifier: ^4.2.1
         version: 4.4.3
 
+  packages/search:
+    dependencies:
+      '@linkatlas/domain':
+        specifier: workspace:*
+        version: link:../domain
+
   packages/storage:
     dependencies:
       '@linkatlas/domain':

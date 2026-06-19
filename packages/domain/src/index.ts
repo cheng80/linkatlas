@@ -1,4 +1,11 @@
-export type { ContentBlockId, DocumentId, DocumentVersionId, JobId, SummaryId } from "./brand.js";
+export type {
+  ChunkId,
+  ContentBlockId,
+  DocumentId,
+  DocumentVersionId,
+  JobId,
+  SummaryId,
+} from "./brand.js";
 export type {
   ContentBlock,
   Document,
