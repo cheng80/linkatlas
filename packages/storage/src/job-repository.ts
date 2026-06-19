@@ -213,7 +213,7 @@ where id = @id and status = 'FAILED'
       return database
         .prepare<{ readonly limit: number }>(
           `
-select id, document_id, status, stage, progress, error_code, updated_at
+select id, document_id, idempotency_key, status, stage, progress, error_code, updated_at
 from jobs
 order by updated_at desc
 limit @limit

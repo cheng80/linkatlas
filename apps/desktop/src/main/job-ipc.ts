@@ -77,10 +77,20 @@ function jobNotFound(): JobCommandResultDto {
 function toJobDto(job: Job): JobDto {
   return {
     id: job.id,
+    documentId: job.documentId,
+    sourceUrl: sourceUrlForJob(job),
     status: job.status,
     stage: job.stage,
     progress: job.progress,
     errorCode: job.errorCode,
     updatedAt: job.updatedAt.toISOString(),
   };
+}
+
+function sourceUrlForJob(job: Job): string | null {
+  const prefix = "ingest-url:";
+  if (!job.idempotencyKey.startsWith(prefix)) {
+    return null;
+  }
+  return job.idempotencyKey.slice(prefix.length);
 }

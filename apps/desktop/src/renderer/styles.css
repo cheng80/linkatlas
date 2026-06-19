@@ -574,23 +574,68 @@ button:disabled {
   border-radius: 8px;
   display: grid;
   gap: 12px;
-  grid-template-columns: minmax(150px, 1fr) minmax(120px, 0.8fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 0.35fr) auto;
   padding: 12px;
 }
 
-.jobs-panel li div:first-child {
+.job-main {
   display: grid;
-  gap: 3px;
+  gap: 5px;
+  min-width: 0;
+}
+
+.job-title-row {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  min-width: 0;
 }
 
 .jobs-panel strong {
   color: #172026;
   font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .jobs-panel li span {
   color: #66727d;
   font-size: 13px;
+}
+
+.job-source {
+  color: #245c73;
+  overflow-wrap: anywhere;
+}
+
+.job-status {
+  background: #eef2f4;
+  border-radius: 6px;
+  color: #46525c;
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 7px;
+}
+
+.job-status.completed {
+  background: #e6f2ec;
+  color: #1f5b3d;
+}
+
+.job-status.failed {
+  background: #f7e9e7;
+  color: #8c2f24;
+}
+
+.job-status.running {
+  background: #e6f1f5;
+  color: #245c73;
+}
+
+.job-progress {
+  min-width: 0;
 }
 
 .jobs-panel progress {
@@ -607,4 +652,15 @@ button:disabled {
   font-size: 13px;
   min-height: 32px;
   padding: 0 10px;
+}
+
+@media (max-width: 760px) {
+  .jobs-panel li {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .job-actions {
+    justify-content: flex-end;
+  }
 }

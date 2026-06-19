@@ -17,6 +17,7 @@ export type JobStage = `stage_${string}`;
 export type Job = {
   readonly id: JobId;
   readonly documentId: DocumentId | null;
+  readonly idempotencyKey: string;
   readonly status: JobStatus;
   readonly stage: JobStage | null;
   readonly progress: number;

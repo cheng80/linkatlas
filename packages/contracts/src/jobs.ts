@@ -16,6 +16,8 @@ export type JobStatusDto = z.infer<typeof JobStatusSchema>;
 
 export const JobDtoSchema = z.object({
   id: z.custom<JobIdDto>((value) => typeof value === "string" && value.startsWith("job_")),
+  documentId: z.string().startsWith("doc_").nullable(),
+  sourceUrl: z.string().url().nullable(),
   status: JobStatusSchema,
   stage: z.string().nullable(),
   progress: z.number().int().min(0).max(100),

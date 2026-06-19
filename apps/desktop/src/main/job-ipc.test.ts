@@ -6,6 +6,7 @@ import { cancelJob, listJobs, retryJob } from "./job-ipc.js";
 const failedJob: Job = {
   id: "job_failed",
   documentId: null,
+  idempotencyKey: "ingest-url:http://127.0.0.1:1/private",
   status: JobStatus.Failed,
   stage: "stage_fetching",
   progress: 30,
@@ -21,6 +22,8 @@ describe("job IPC handlers", () => {
       jobs: [
         {
           id: "job_failed",
+          documentId: null,
+          sourceUrl: "http://127.0.0.1:1/private",
           status: JobStatus.Failed,
           stage: "stage_fetching",
           progress: 30,

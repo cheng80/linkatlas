@@ -18,6 +18,7 @@ export const JobStageSchema = z.custom<JobStage>(
 const JobRowSchema = z.object({
   id: JobIdSchema,
   document_id: DocumentIdSchema.nullable(),
+  idempotency_key: z.string().min(1),
   status: z.enum([
     JobStatus.Queued,
     JobStatus.Running,
@@ -35,7 +36,7 @@ const JobRowSchema = z.object({
 export function getJobById(database: LinkAtlasDatabase, id: JobId): Job | null {
   const row = database
     .prepare<[JobId]>(
-      "select id, document_id, status, stage, progress, error_code, updated_at from jobs where id = ?",
+      "select id, document_id, idempotency_key, status, stage, progress, error_code, updated_at from jobs where id = ?",
     )
     .get(id);
   return row === undefined ? null : parseJob(row);
@@ -48,7 +49,7 @@ export function getJobByIdempotencyKey(
   const row = database
     .prepare<[string]>(
       `
-select id, document_id, status, stage, progress, error_code, updated_at
+select id, document_id, idempotency_key, status, stage, progress, error_code, updated_at
 from jobs
 where idempotency_key = ?
 `,
@@ -62,6 +63,7 @@ export function parseJob(input: unknown): Job {
   return {
     id: row.id,
     documentId: row.document_id,
+    idempotencyKey: row.idempotency_key,
     status: row.status,
     stage: row.stage,
     progress: row.progress,
