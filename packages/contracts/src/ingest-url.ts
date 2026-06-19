@@ -25,6 +25,8 @@ export const IngestUrlResultSchema = z.discriminatedUnion("ok", [
   z.object({
     ok: z.literal(true),
     documentId: z.string().min(1),
+    jobId: z.string().min(1),
+    jobStatus: z.enum(["QUEUED", "RUNNING", "BLOCKED", "FAILED", "COMPLETED", "CANCELLED"]),
     finalUrl: z.string().url(),
     title: z.string(),
     byteLength: z.number().int().nonnegative(),

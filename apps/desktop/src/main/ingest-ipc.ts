@@ -2,15 +2,16 @@ import { createHash } from "node:crypto";
 import type { IngestUrlRequestDto, IngestUrlResultDto } from "@linkatlas/contracts";
 import { parseIngestUrlRequest } from "@linkatlas/contracts";
 import type { ContentBlock, Document, DocumentVersion } from "@linkatlas/domain";
-import { DocumentStatus } from "@linkatlas/domain";
+import { AppErrorCode, DocumentStatus, JobStatus } from "@linkatlas/domain";
 import type { ExtractedArticleBlock } from "@linkatlas/ingestion";
 import { extractArticle, FetchError, FetchErrorCode, fetchHtml } from "@linkatlas/ingestion";
-import type { DocumentRepository } from "@linkatlas/storage";
+import type { DocumentRepository, JobRepository } from "@linkatlas/storage";
 import { ipcMain } from "electron";
 
 export type IngestUrlHandlerOptions = {
   readonly allowedHosts: readonly string[];
   readonly documentRepository: DocumentRepository;
+  readonly jobRepository: JobRepository;
   readonly now?: () => Date;
 };
 
@@ -37,7 +38,35 @@ export function createIngestUrlHandler(
       };
     }
 
+    const requestedAt = options.now?.() ?? new Date();
+    const job = options.jobRepository.enqueue({
+      id: jobIdForUrl(request.url),
+      documentId: null,
+      idempotencyKey: `ingest-url:${request.url}`,
+      now: requestedAt,
+      stage: "stage_fetching",
+    });
+    const leasedJob = options.jobRepository.acquireNext({
+      leaseExpiresAt: new Date(requestedAt.getTime() + 60_000),
+      now: requestedAt,
+      workerId: "main-ingest",
+    });
+
+    if (leasedJob?.id !== job.id) {
+      return {
+        ok: false,
+        errorCode: "UNKNOWN_FETCH_ERROR",
+        message: "URL 작업이 이미 처리 중입니다.",
+      };
+    }
+
     try {
+      options.jobRepository.updateProgress({
+        id: job.id,
+        now: options.now?.() ?? new Date(),
+        progress: 10,
+        stage: "stage_fetching",
+      });
       const fetched = await fetchHtml({
         url: request.url,
         policy: {
@@ -46,6 +75,12 @@ export function createIngestUrlHandler(
           maxRedirects: 5,
           timeoutMs: 10_000,
         },
+      });
+      options.jobRepository.updateProgress({
+        id: job.id,
+        now: options.now?.() ?? new Date(),
+        progress: 45,
+        stage: "stage_extracting",
       });
       const article = extractArticle({ html: fetched.html, url: fetched.finalUrl });
       const now = options.now?.() ?? new Date();
@@ -68,11 +103,20 @@ export function createIngestUrlHandler(
       };
       const blocks = article.blocks.map((block): ContentBlock => toContentBlock(versionId, block));
 
+      options.jobRepository.updateProgress({
+        id: job.id,
+        now,
+        progress: 80,
+        stage: "stage_storing",
+      });
       options.documentRepository.saveDocumentSnapshot({ document, version, blocks });
+      const completedJob = options.jobRepository.complete({ id: job.id, now });
 
       return {
         ok: true,
         documentId,
+        jobId: job.id,
+        jobStatus: completedJob?.status ?? JobStatus.Completed,
         finalUrl: fetched.finalUrl,
         title: article.title,
         byteLength: Buffer.byteLength(fetched.html),
@@ -82,6 +126,11 @@ export function createIngestUrlHandler(
       };
     } catch (error) {
       if (error instanceof FetchError) {
+        options.jobRepository.fail({
+          errorCode: fetchErrorToAppErrorCode(error.errorCode),
+          id: job.id,
+          now: options.now?.() ?? new Date(),
+        });
         return {
           ok: false,
           errorCode: error.errorCode,
@@ -89,6 +138,11 @@ export function createIngestUrlHandler(
         };
       }
 
+      options.jobRepository.fail({
+        errorCode: AppErrorCode.InvalidInput,
+        id: job.id,
+        now: options.now?.() ?? new Date(),
+      });
       return {
         ok: false,
         errorCode: "UNKNOWN_FETCH_ERROR",
@@ -123,6 +177,10 @@ function documentIdForUrl(url: string): `doc_${string}` {
   return `doc_${sha256(url).slice(0, 24)}`;
 }
 
+function jobIdForUrl(url: string): `job_${string}` {
+  return `job_${sha256(url).slice(0, 24)}`;
+}
+
 function documentVersionIdForHash(contentHash: string): `docver_${string}` {
   return `docver_${sha256(contentHash).slice(0, 24)}`;
 }
@@ -143,6 +201,22 @@ function toContentBlock(
 
 function sha256(value: string): string {
   return createHash("sha256").update(value).digest("hex");
+}
+
+function fetchErrorToAppErrorCode(errorCode: FetchErrorCode): AppErrorCode {
+  switch (errorCode) {
+    case FetchErrorCode.InvalidUrl:
+    case FetchErrorCode.UnsupportedProtocol:
+    case FetchErrorCode.LocalNetworkBlocked:
+      return AppErrorCode.InvalidInput;
+    case FetchErrorCode.RedirectLimitExceeded:
+    case FetchErrorCode.ResponseTooLarge:
+    case FetchErrorCode.RequestTimeout:
+    case FetchErrorCode.HttpStatusError:
+      return AppErrorCode.ProviderUnavailable;
+    default:
+      return assertNever(errorCode);
+  }
 }
 
 function assertNever(value: never): never {

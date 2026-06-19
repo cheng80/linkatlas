@@ -10,6 +10,7 @@ type IngestState =
       readonly kind: "accepted";
       readonly title: string;
       readonly finalUrl: string;
+      readonly jobStatus: string;
       readonly blockCount: number;
       readonly excerpt: string | null;
       readonly language: string | null;
@@ -60,6 +61,7 @@ function App(): React.JSX.Element {
         kind: "accepted",
         title: result.title,
         finalUrl: result.finalUrl,
+        jobStatus: result.jobStatus,
         blockCount: result.blockCount,
         excerpt: result.excerpt,
         language: result.language,
@@ -136,6 +138,10 @@ function LibraryCard(props: {
       </div>
       <p>{state.excerpt ?? "요약 가능한 본문이 저장되었습니다."}</p>
       <dl>
+        <div>
+          <dt>Job</dt>
+          <dd>{state.jobStatus}</dd>
+        </div>
         <div>
           <dt>Blocks</dt>
           <dd>{state.blockCount}</dd>

@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import {
   createSqliteConnection,
   createSqliteDocumentRepository,
+  createSqliteJobRepository,
   type LinkAtlasDatabase,
   migrateDatabase,
 } from "@linkatlas/storage";
@@ -45,6 +46,7 @@ app.whenReady().then(() => {
   registerIngestIpc({
     allowedHosts: allowedFetchHosts(),
     documentRepository: createSqliteDocumentRepository(database),
+    jobRepository: createSqliteJobRepository(database),
   });
   app.once("before-quit", () => {
     database.close();
