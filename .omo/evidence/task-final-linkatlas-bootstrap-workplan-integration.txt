@@ -1,0 +1,12 @@
+
+> linkatlas@0.0.0 test:integration /Users/cheng80/Desktop/linkatlas
+> vitest run tests/integration
+
+
+ RUN  v4.1.9 /Users/cheng80/Desktop/linkatlas
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  09:46:27
+   Duration  77ms (transform 10ms, setup 0ms, import 16ms, tests 1ms, environment 0ms)

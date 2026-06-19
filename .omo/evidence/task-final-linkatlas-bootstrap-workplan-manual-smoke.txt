@@ -1,0 +1,9 @@
+{
+  "heading": "LinkAtlas",
+  "version": "Version 0.0.0",
+  "globals": {
+    "hasProcess": false,
+    "hasRequire": false
+  },
+  "url": "file:///Users/cheng80/Desktop/linkatlas/apps/desktop/dist/renderer/index.html"
+}

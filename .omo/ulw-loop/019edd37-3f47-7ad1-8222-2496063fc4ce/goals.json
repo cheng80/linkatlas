@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "createdAt": "2026-06-19T00:26:00.520Z",
+  "updatedAt": "2026-06-19T00:50:18.708Z",
+  "briefPath": ".omo/ulw-loop/019edd37-3f47-7ad1-8222-2496063fc4ce/brief.md",
+  "goalsPath": ".omo/ulw-loop/019edd37-3f47-7ad1-8222-2496063fc4ce/goals.json",
+  "ledgerPath": ".omo/ulw-loop/019edd37-3f47-7ad1-8222-2496063fc4ce/ledger.jsonl",
+  "codexGoalMode": "aggregate",
+  "goals": [
+    {
+      "id": "G001-execute-the-approved-linkatlas-boots",
+      "title": "Execute the approved LinkAtlas bootstrap work plan in .omo/plans/link...",
+      "objective": "Execute the approved LinkAtlas bootstrap work plan in .omo/plans/linkatlas-bootstrap-workplan.md. Deliver a runnable pnpm TypeScript workspace, secure Electron React desktop shell, typed contracts/domain packages, fixture/readiness docs, and captured evidence for lint/typecheck/tests/Electron smoke/security boundaries. Respect docs/DESIGN.md, docs/CODEX_EXECUTION_PLAN.md, AGENTS.md, and preserve existing user changes. Do not implement real SQLite persistence, URL ingestion, Ollama, browser extension, or packaging.",
+      "status": "complete",
+      "successCriteria": [
+        {
+          "id": "C001",
+          "scenario": "CLI/build surface: run pnpm install, pnpm lint, pnpm typecheck, pnpm test, pnpm test:integration, and pnpm test:e2e from /Users/cheng80/Desktop/linkatlas after bootstrap. PASS iff each command exits 0 and outputs are captured.",
+          "userModel": "happy",
+          "expectedEvidence": ".omo/ulw-loop/evidence/G001-C001-cli-checks.txt plus .omo/evidence/task-final-linkatlas-bootstrap-workplan-*.txt",
+          "essential": true,
+          "capturedEvidence": ".omo/ulw-loop/evidence/G001-C001-cli-checks.txt; logs in .omo/evidence/task-final-linkatlas-bootstrap-workplan-{lint,typecheck,test,integration,e2e}.txt; cleanup .omo/evidence/task-final-linkatlas-bootstrap-workplan-cleanup.txt",
+          "status": "pass",
+          "capturedAt": "2026-06-19T00:45:22.008Z"
+        },
+        {
+          "id": "C002",
+          "scenario": "Security/adversarial surface: run static tests/scans proving BrowserWindow uses nodeIntegration=false, contextIsolation=true, sandbox=true; renderer/domain have no forbidden imports; preload exposes no execute/readFile/writeFile/querySql/raw IPC APIs. PASS iff checks exit 0 and negative fixture/mutation proof shows violations are caught or documented.",
+          "userModel": "edge",
+          "expectedEvidence": ".omo/ulw-loop/evidence/G001-C002-security-boundaries.txt",
+          "essential": true,
+          "capturedEvidence": ".omo/ulw-loop/evidence/G001-C002-security-boundaries.txt; boundary tests and manual smoke confirm renderer/domain/preload constraints",
+          "status": "pass",
+          "capturedAt": "2026-06-19T00:45:22.039Z"
+        },
+        {
+          "id": "C003",
+          "scenario": "Real desktop surface: drive the configured Electron smoke command after implementation, preferably pnpm test:e2e -- --grep desktop-smoke or the exact equivalent. PASS iff the app shell launches, displays the smoke API value, renderer has no Node globals, and cleanup receipt shows no Electron/Vite process remains.",
+          "userModel": "regression",
+          "expectedEvidence": ".omo/ulw-loop/evidence/G001-C003-desktop-smoke.txt and optional screenshot path",
+          "essential": false,
+          "capturedEvidence": ".omo/ulw-loop/evidence/G001-C003-desktop-smoke.txt; manual smoke confirms LinkAtlas heading, Version 0.0.0, no process/require globals, file:// renderer, cleanup clean",
+          "status": "pass",
+          "capturedAt": "2026-06-19T00:45:22.070Z"
+        }
+      ],
+      "attempt": 1,
+      "createdAt": "2026-06-19T00:26:00.520Z",
+      "updatedAt": "2026-06-19T00:50:18.708Z",
+      "startedAt": "2026-06-19T00:26:40.541Z",
+      "completedAt": "2026-06-19T00:50:18.708Z",
+      "evidence": ".omo/ulw-loop/evidence/G001-C001-cli-checks.txt; .omo/ulw-loop/evidence/G001-C002-security-boundaries.txt; .omo/ulw-loop/evidence/G001-C003-desktop-smoke.txt; .omo/ulw-loop/evidence/G001-final-self-review.txt; .omo/ulw-loop/evidence/G001-quality-gate.json"
+    }
+  ],
+  "codexObjective": "Complete the durable ulw-loop plan in .omo/ulw-loop/019edd37-3f47-7ad1-8222-2496063fc4ce/goals.json, including later accepted/appended stories, under the original brief constraints; use .omo/ulw-loop/019edd37-3f47-7ad1-8222-2496063fc4ce/ledger.jsonl as the audit trail.",
+  "aggregateCompletion": {
+    "status": "complete",
+    "completedAt": "2026-06-19T00:50:18.708Z",
+    "evidence": ".omo/ulw-loop/evidence/G001-C001-cli-checks.txt; .omo/ulw-loop/evidence/G001-C002-security-boundaries.txt; .omo/ulw-loop/evidence/G001-C003-desktop-smoke.txt; .omo/ulw-loop/evidence/G001-final-self-review.txt; .omo/ulw-loop/evidence/G001-quality-gate.json",
+    "codexGoal": {
+      "goal": {
+        "threadId": "019edd37-3f47-7ad1-8222-2496063fc4ce",
+        "objective": "Complete the durable ulw-loop plan in .omo/ulw-loop/019edd37-3f47-7ad1-8222-2496063fc4ce/goals.json, including later accepted/appended stories, under the original brief constraints; use .omo/ulw-loop/019edd37-3f47-7ad1-8222-2496063fc4ce/ledger.jsonl as the audit trail.",
+        "status": "complete",
+        "tokensUsed": 355509,
+        "timeUsedSeconds": 1285,
+        "createdAt": 1781828809,
+        "updatedAt": 1781830094
+      },
+      "remainingTokens": null,
+      "completionBudgetReport": "Goal achieved. Report final usage from this tool result's structured goal fields. If `goal.tokenBudget` is present, include token usage from `goal.tokensUsed` and `goal.tokenBudget`. If `goal.timeUsedSeconds` is greater than 0, summarize elapsed time in a concise, human-friendly form appropriate to the response language."
+    }
+  }
+}

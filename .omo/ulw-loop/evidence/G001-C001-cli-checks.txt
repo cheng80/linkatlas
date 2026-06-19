@@ -1,0 +1,15 @@
+# C001 CLI/build surface evidence
+
+- pnpm install: 완료, pnpm-lock.yaml 생성/갱신됨; electron/esbuild rebuild 완료.
+- pnpm lint: PASS (Biome 43 files, boundary tests 3 passed).
+- pnpm typecheck: PASS.
+- pnpm test: PASS (6 files, 12 tests).
+- pnpm test:integration: PASS (1 file, 1 test).
+- pnpm test:e2e: PASS (Electron smoke 1 passed).
+
+Detailed logs:
+.omo/evidence/task-final-linkatlas-bootstrap-workplan-lint.txt
+.omo/evidence/task-final-linkatlas-bootstrap-workplan-typecheck.txt
+.omo/evidence/task-final-linkatlas-bootstrap-workplan-test.txt
+.omo/evidence/task-final-linkatlas-bootstrap-workplan-integration.txt
+.omo/evidence/task-final-linkatlas-bootstrap-workplan-e2e.txt

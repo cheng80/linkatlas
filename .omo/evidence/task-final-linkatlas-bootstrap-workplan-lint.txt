@@ -1,0 +1,17 @@
+
+> linkatlas@0.0.0 lint /Users/cheng80/Desktop/linkatlas
+> biome check . && pnpm test:boundaries
+
+Checked 43 files in 7ms. No fixes applied.
+
+> linkatlas@0.0.0 test:boundaries /Users/cheng80/Desktop/linkatlas
+> vitest run tests/boundaries
+
+
+ RUN  v4.1.9 /Users/cheng80/Desktop/linkatlas
+
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  09:46:26
+   Duration  82ms (transform 13ms, setup 0ms, import 18ms, tests 2ms, environment 0ms)

@@ -1,0 +1,11 @@
+# C002 security/adversarial surface evidence
+
+- pnpm lint includes tests/boundaries: PASS.
+- Boundary tests assert renderer/domain/preload forbidden imports and generic privileged API exposure constraints.
+- Electron main webPreferences covered by unit test: nodeIntegration false, contextIsolation true, sandbox true, preload allowlist only.
+- Main window denies new windows and blocks non-file navigation.
+- Renderer smoke verified no process/require globals through Electron E2E/manual smoke.
+
+Detailed logs:
+.omo/evidence/task-final-linkatlas-bootstrap-workplan-lint.txt
+.omo/evidence/task-final-linkatlas-bootstrap-workplan-manual-smoke.txt

@@ -1,0 +1,18 @@
+# C003 desktop smoke evidence
+
+- pnpm test:e2e: PASS; built desktop app and launched Electron through Playwright.
+- Manual smoke: PASS; heading LinkAtlas visible, version value from preload API is Version 0.0.0, renderer lacks process/require globals.
+- No dev server required; production renderer loaded via file:// dist/renderer/index.html.
+
+Manual smoke output:
+{
+  "heading": "LinkAtlas",
+  "version": "Version 0.0.0",
+  "globals": {
+    "hasProcess": false,
+    "hasRequire": false
+  },
+  "url": "file:///Users/cheng80/Desktop/linkatlas/apps/desktop/dist/renderer/index.html"
+}
+
+cleanup: no LinkAtlas Electron or Playwright test processes running

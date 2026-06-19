@@ -1,0 +1,7 @@
+# Final self-review gate
+
+- git diff --check: PASS.
+- Tracked doc move: root DESIGN.md and CODEX_EXECUTION_PLAN.md removed; docs/DESIGN.md and docs/CODEX_EXECUTION_PLAN.md present.
+- Generated dist/node_modules/test-results/tsbuildinfo artifacts are ignored.
+- No database migration or persisted user data path was introduced in this bootstrap slice.
+- Review constraint: sub-agent reviewers were not spawned because current tool policy only allows spawning when user explicitly requests delegation/subagents.

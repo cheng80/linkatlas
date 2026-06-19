@@ -1,0 +1,1 @@
+cleanup: no LinkAtlas Electron or Playwright test processes running

@@ -1,0 +1,3 @@
+
+> linkatlas@0.0.0 typecheck /Users/cheng80/Desktop/linkatlas
+> tsc -b packages/contracts packages/domain apps/desktop/tsconfig.main.json apps/desktop/tsconfig.preload.json tests && tsc -p apps/desktop/tsconfig.renderer.json --noEmit

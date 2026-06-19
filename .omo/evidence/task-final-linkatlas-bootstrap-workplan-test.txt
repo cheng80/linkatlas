@@ -1,0 +1,12 @@
+
+> linkatlas@0.0.0 test /Users/cheng80/Desktop/linkatlas
+> vitest run
+
+
+ RUN  v4.1.9 /Users/cheng80/Desktop/linkatlas
+
+
+ Test Files  6 passed (6)
+      Tests  12 passed (12)
+   Start at  09:46:27
+   Duration  161ms (transform 144ms, setup 0ms, import 201ms, tests 11ms, environment 0ms)
