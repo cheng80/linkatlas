@@ -1,5 +1,8 @@
 import type {
   AppInfoDto,
+  AskQuestionRequestDto,
+  AskStartResultDto,
+  AskStreamEventDto,
   IngestUrlRequestDto,
   IngestUrlResultDto,
   JobCommandRequestDto,
@@ -17,6 +20,8 @@ import type {
 } from "@linkatlas/contracts";
 
 export const linkAtlasIpcChannels = {
+  askEvent: "linkAtlas:ask:event",
+  askStart: "linkAtlas:ask:start",
   cancelJob: "linkAtlas:jobs:cancel",
   ingestUrl: "linkAtlas:ingestUrl",
   listJobs: "linkAtlas:jobs:list",
@@ -33,6 +38,10 @@ export const linkAtlasIpcChannels = {
 export type LinkAtlasApi = {
   readonly app: {
     readonly getVersion: () => Promise<AppInfoDto>;
+  };
+  readonly ask: {
+    readonly onEvent: (callback: (event: AskStreamEventDto) => void) => () => void;
+    readonly start: (input: AskQuestionRequestDto) => Promise<AskStartResultDto>;
   };
   readonly ingest: {
     readonly addUrl: (input: IngestUrlRequestDto) => Promise<IngestUrlResultDto>;

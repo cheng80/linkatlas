@@ -24,6 +24,7 @@ export async function indexChunks(input: {
       input.chunks.map((chunk, index) => ({
         id: chunk.id,
         metadata: {
+          blockIds: JSON.stringify(chunk.blockIds),
           documentId: chunk.documentId,
           headingPath: JSON.stringify(chunk.headingPath),
           text: chunk.text,

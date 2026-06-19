@@ -16,7 +16,8 @@ body {
 }
 
 button,
-input {
+input,
+textarea {
   font: inherit;
 }
 
@@ -75,7 +76,8 @@ input {
 }
 
 .url-entry label,
-.search-entry label {
+.search-entry label,
+.ask-entry label {
   display: grid;
   gap: 6px;
 }
@@ -88,7 +90,8 @@ input {
 }
 
 .url-entry span,
-.search-entry span {
+.search-entry span,
+.ask-entry span {
   color: #66727d;
   font-size: 12px;
   font-weight: 700;
@@ -96,11 +99,93 @@ input {
 }
 
 .url-entry input,
-.search-entry input {
+.search-entry input,
+.ask-entry textarea {
   border: 1px solid #c8d0d7;
   border-radius: 8px;
   min-height: 40px;
   padding: 0 12px;
+}
+
+.ask-entry {
+  display: grid;
+  gap: 10px;
+  max-width: 760px;
+}
+
+.ask-entry textarea {
+  line-height: 1.5;
+  min-height: 108px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.ask-entry button {
+  justify-self: start;
+}
+
+.ask-answer {
+  background: #ffffff;
+  border: 1px solid #d7dde2;
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+  max-width: 760px;
+  min-height: 160px;
+  padding: 18px;
+}
+
+.ask-answer p {
+  color: #465560;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.citation-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.citation-list li {
+  align-items: center;
+  background: #f5f7f8;
+  border-radius: 8px;
+  display: flex;
+  gap: 8px;
+  padding: 7px 9px;
+}
+
+.citation-list button {
+  font-size: 12px;
+  min-height: 26px;
+  padding: 0 8px;
+}
+
+.citation-list span {
+  color: #465560;
+  font-size: 13px;
+}
+
+.source-preview {
+  border-top: 1px solid #d7dde2;
+  display: grid;
+  gap: 6px;
+  padding-top: 12px;
+}
+
+.source-preview strong {
+  color: #172026;
+  font-size: 13px;
+}
+
+.source-preview span {
+  color: #465560;
+  line-height: 1.55;
 }
 
 .search-results {

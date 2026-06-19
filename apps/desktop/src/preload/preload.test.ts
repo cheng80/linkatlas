@@ -6,6 +6,7 @@ describe("preload API contract", () => {
   it("exposes only typed allowlist namespaces", () => {
     const exposedKeys = [
       "app",
+      "ask",
       "ingest",
       "jobs",
       "knowledge",
@@ -14,7 +15,7 @@ describe("preload API contract", () => {
     ] satisfies readonly (keyof LinkAtlasApi)[];
     const forbiddenKeys = ["execute", "readFile", "writeFile", "querySql", "ipcRenderer"];
 
-    expect(exposedKeys).toEqual(["app", "ingest", "jobs", "knowledge", "models", "search"]);
+    expect(exposedKeys).toEqual(["app", "ask", "ingest", "jobs", "knowledge", "models", "search"]);
     expect(forbiddenKeys).not.toContain("app");
   });
 });

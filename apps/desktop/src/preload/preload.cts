@@ -6,6 +6,20 @@ const api: LinkAtlasApi = {
   app: {
     getVersion: async () => ({ name: "LinkAtlas", version: appVersion() }),
   },
+  ask: {
+    onEvent: (callback) => {
+      const listener = (_event: unknown, payload: unknown): void => {
+        callback(payload as Parameters<typeof callback>[0]);
+      };
+      electron.ipcRenderer.on("linkAtlas:ask:event", listener);
+      return () => {
+        electron.ipcRenderer.off("linkAtlas:ask:event", listener);
+      };
+    },
+    start: async (input) => {
+      return await electron.ipcRenderer.invoke("linkAtlas:ask:start", input);
+    },
+  },
   ingest: {
     addUrl: async (input) => {
       return await electron.ipcRenderer.invoke("linkAtlas:ingestUrl", input);

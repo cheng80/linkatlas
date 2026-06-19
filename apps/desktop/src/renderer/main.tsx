@@ -1,4 +1,5 @@
 import type {
+  AskCitationDto,
   DocumentSummaryDto,
   JobDto,
   RelatedDocumentDto,
@@ -49,6 +50,12 @@ function App(): React.JSX.Element {
   const [relatedSourceId, setRelatedSourceId] = useState<string | null>(null);
   const [relatedDocuments, setRelatedDocuments] = useState<readonly RelatedDocumentDto[]>([]);
   const [view, setView] = useState(currentView());
+  const [askQuestion, setAskQuestion] = useState("");
+  const [askAnswer, setAskAnswer] = useState("");
+  const [askCitations, setAskCitations] = useState<readonly AskCitationDto[]>([]);
+  const [selectedCitation, setSelectedCitation] = useState<AskCitationDto | null>(null);
+  const [askStatus, setAskStatus] = useState("idle");
+  const [activeAskRequestId, setActiveAskRequestId] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -103,6 +110,32 @@ function App(): React.JSX.Element {
       window.removeEventListener("hashchange", updateView);
     };
   }, []);
+
+  useEffect(() => {
+    return window.linkAtlas.ask.onEvent((event) => {
+      if (activeAskRequestId !== null && event.requestId !== activeAskRequestId) {
+        return;
+      }
+      switch (event.type) {
+        case "status":
+          setAskStatus(event.message);
+          break;
+        case "token":
+          setAskAnswer((current) => `${current}${event.text}`);
+          break;
+        case "done":
+          setAskStatus("done");
+          setAskAnswer(event.answer.answerMarkdown);
+          setAskCitations(event.answer.citations);
+          break;
+        case "error":
+          setAskStatus(event.message);
+          break;
+        default:
+          assertNever(event);
+      }
+    });
+  }, [activeAskRequestId]);
 
   useEffect(() => {
     if (view === "topics") {
@@ -216,6 +249,23 @@ function App(): React.JSX.Element {
     await refreshRelated(relatedSourceId);
   }
 
+  async function submitAsk(event: React.FormEvent<HTMLFormElement>): Promise<void> {
+    event.preventDefault();
+    if (askQuestion.trim().length === 0) {
+      return;
+    }
+    setAskAnswer("");
+    setAskCitations([]);
+    setSelectedCitation(null);
+    setAskStatus("starting");
+    const result = await window.linkAtlas.ask.start({ limit: 8, question: askQuestion });
+    if (result.ok && result.requestId !== undefined) {
+      setActiveAskRequestId(result.requestId);
+      return;
+    }
+    setAskStatus(result.message ?? "질문을 시작할 수 없습니다.");
+  }
+
   return (
     <main className="shell">
       <aside className="sidebar" aria-label="LinkAtlas navigation">
@@ -264,6 +314,17 @@ function App(): React.JSX.Element {
         </header>
         {view === "topics" ? (
           <TopicPanel topics={topics} />
+        ) : view === "ask" ? (
+          <AskPanel
+            answer={askAnswer}
+            citations={askCitations}
+            question={askQuestion}
+            selectedCitation={selectedCitation}
+            status={askStatus}
+            onCitationSelect={setSelectedCitation}
+            onQuestionChange={setAskQuestion}
+            onSubmit={submitAsk}
+          />
         ) : (
           <section className="inbox-panel">
             <p className="eyebrow">Local-first knowledge base</p>
@@ -366,6 +427,63 @@ function RelatedPanel(input: {
   );
 }
 
+function AskPanel(input: {
+  readonly answer: string;
+  readonly citations: readonly AskCitationDto[];
+  readonly question: string;
+  readonly selectedCitation: AskCitationDto | null;
+  readonly status: string;
+  readonly onCitationSelect: (citation: AskCitationDto) => void;
+  readonly onQuestionChange: (value: string) => void;
+  readonly onSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
+}): React.JSX.Element {
+  return (
+    <section className="inbox-panel">
+      <p className="eyebrow">Evidence QA</p>
+      <h2 id="workspace-title">Ask</h2>
+      <form className="ask-entry" onSubmit={input.onSubmit}>
+        <label>
+          <span>Question</span>
+          <textarea
+            placeholder="저장된 자료에 근거해 질문"
+            value={input.question}
+            onChange={(event) => input.onQuestionChange(event.currentTarget.value)}
+          />
+        </label>
+        <button type="submit" disabled={input.question.trim().length === 0}>
+          Ask
+        </button>
+      </form>
+      <section className="ask-answer" aria-label="Ask answer">
+        <p className="eyebrow">{input.status}</p>
+        <p>
+          {input.answer.length > 0
+            ? input.answer
+            : "질문을 입력하면 근거가 있는 답변을 생성합니다."}
+        </p>
+        {input.citations.length > 0 ? (
+          <ul className="citation-list">
+            {input.citations.map((citation) => (
+              <li key={citation.citationId}>
+                <button type="button" onClick={() => input.onCitationSelect(citation)}>
+                  {citation.citationId}
+                </button>
+                <span>{citation.claim}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {input.selectedCitation !== null ? (
+          <article className="source-preview" aria-label="Source block preview">
+            <strong>{input.selectedCitation.blockIds.join(", ")}</strong>
+            <span>{input.selectedCitation.previewText ?? input.selectedCitation.claim}</span>
+          </article>
+        ) : null}
+      </section>
+    </section>
+  );
+}
+
 function renderIngestState(state: IngestState): string {
   switch (state.kind) {
     case "idle":
@@ -398,8 +516,14 @@ function assertNever(value: never): never {
   throw new Error(`Unhandled state: ${String(value)}`);
 }
 
-function currentView(): "inbox" | "topics" {
-  return window.location.hash === "#topics" ? "topics" : "inbox";
+function currentView(): "ask" | "inbox" | "topics" {
+  if (window.location.hash === "#topics") {
+    return "topics";
+  }
+  if (window.location.hash === "#ask") {
+    return "ask";
+  }
+  return "inbox";
 }
 
 const rootElement = document.querySelector("#root");

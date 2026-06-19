@@ -1,5 +1,20 @@
 export type { AppInfoDto } from "./app-info.js";
 export { AppInfoSchema, parseAppInfo } from "./app-info.js";
+export type {
+  AskAnswerDto,
+  AskCitationDto,
+  AskQuestionRequestDto,
+  AskStartResultDto,
+  AskStreamEventDto,
+} from "./ask.js";
+export {
+  AskAnswerDtoSchema,
+  AskCitationDtoSchema,
+  AskQuestionRequestSchema,
+  AskStartResultSchema,
+  AskStreamEventSchema,
+  parseAskQuestionRequest,
+} from "./ask.js";
 export type { ContractErrorCode, ContractErrorDto } from "./errors.js";
 export {
   ContractErrorCodeSchema,

@@ -14,6 +14,7 @@ import {
 } from "@linkatlas/storage";
 import { app, BrowserWindow } from "electron";
 
+import { registerAskIpc } from "./ask-ipc.js";
 import { registerIngestIpc } from "./ingest-ipc.js";
 import { registerJobIpc } from "./job-ipc.js";
 import { registerKnowledgeIpc } from "./knowledge-ipc.js";
@@ -88,6 +89,14 @@ app.whenReady().then(() => {
   });
   registerJobIpc({ jobRepository });
   registerKnowledgeIpc({ knowledgeRepository });
+  registerAskIpc({
+    chunkRepository,
+    embeddingModel: defaultEmbeddingModel,
+    embeddingProvider,
+    generationModel: defaultAnalysisModel,
+    generationProvider,
+    vectorIndex,
+  });
   registerModelIpc({
     generationProvider,
   });
