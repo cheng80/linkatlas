@@ -5,7 +5,9 @@ import type {
   ContentBlock,
   Document,
   DocumentVersion,
+  EmbeddingProvider,
   GenerationProvider,
+  VectorIndex,
 } from "@linkatlas/domain";
 import { AppErrorCode, DocumentStatus, JobStatus } from "@linkatlas/domain";
 import type { ExtractedArticleBlock } from "@linkatlas/ingestion";
@@ -18,6 +20,7 @@ import type {
 } from "@linkatlas/storage";
 import { ipcMain } from "electron";
 import { maybeAnalyzeDocument } from "./analysis-summary.js";
+import { indexChunks } from "./embedding-index.js";
 
 export type IngestUrlHandlerOptions = {
   readonly allowedHosts: readonly string[];
@@ -26,7 +29,10 @@ export type IngestUrlHandlerOptions = {
   readonly chunkRepository?: ChunkRepository;
   readonly summaryRepository?: SummaryRepository;
   readonly generationProvider?: GenerationProvider;
+  readonly embeddingProvider?: EmbeddingProvider;
+  readonly vectorIndex?: VectorIndex;
   readonly analysisModel?: string;
+  readonly embeddingModel?: string;
   readonly now?: () => Date;
 };
 
@@ -129,6 +135,14 @@ export function createIngestUrlHandler(
         now,
         snapshot: { blocks, document, version },
       });
+      if (options.chunkRepository !== undefined) {
+        await indexChunks({
+          chunks: options.chunkRepository.listDocumentChunks(documentId),
+          embeddingProvider: options.embeddingProvider,
+          model: options.embeddingModel,
+          vectorIndex: options.vectorIndex,
+        });
+      }
       const summary = await maybeAnalyzeDocument({
         blocks,
         documentId,

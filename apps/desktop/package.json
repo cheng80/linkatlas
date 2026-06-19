@@ -19,6 +19,7 @@
     "@linkatlas/domain": "workspace:*",
     "@linkatlas/ingestion": "workspace:*",
     "@linkatlas/llm": "workspace:*",
+    "@linkatlas/search": "workspace:*",
     "@linkatlas/storage": "workspace:*",
     "react": "^19.2.3",
     "react-dom": "^19.2.3"

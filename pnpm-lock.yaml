@@ -53,6 +53,9 @@ importers:
       '@linkatlas/llm':
         specifier: workspace:*
         version: link:../../packages/llm
+      '@linkatlas/search':
+        specifier: workspace:*
+        version: link:../../packages/search
       '@linkatlas/storage':
         specifier: workspace:*
         version: link:../../packages/storage

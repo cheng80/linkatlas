@@ -1,6 +1,7 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { OllamaGenerationProvider } from "@linkatlas/llm";
+import { OllamaEmbeddingProvider, OllamaGenerationProvider } from "@linkatlas/llm";
+import { InMemoryVectorIndex } from "@linkatlas/search";
 import {
   createSqliteChunkRepository,
   createSqliteConnection,
@@ -58,7 +59,12 @@ app.whenReady().then(() => {
   const database = createAppDatabase();
   const jobRepository = createSqliteJobRepository(database);
   const chunkRepository = createSqliteChunkRepository(database);
+  const vectorIndex = new InMemoryVectorIndex();
   const generationProvider = new OllamaGenerationProvider({
+    baseUrl: process.env[ollamaBaseUrlKey] ?? "http://127.0.0.1:11434",
+    timeoutMs: 1_000,
+  });
+  const embeddingProvider = new OllamaEmbeddingProvider({
     baseUrl: process.env[ollamaBaseUrlKey] ?? "http://127.0.0.1:11434",
     timeoutMs: 1_000,
   });
@@ -67,15 +73,23 @@ app.whenReady().then(() => {
     analysisModel: "gemma4:12b",
     chunkRepository,
     documentRepository: createSqliteDocumentRepository(database),
+    embeddingModel: "embeddinggemma",
+    embeddingProvider,
     generationProvider,
     jobRepository,
     summaryRepository: createSqliteSummaryRepository(database),
+    vectorIndex,
   });
   registerJobIpc({ jobRepository });
   registerModelIpc({
     generationProvider,
   });
-  registerSearchIpc({ chunkRepository });
+  registerSearchIpc({
+    chunkRepository,
+    embeddingModel: "embeddinggemma",
+    embeddingProvider,
+    vectorIndex,
+  });
   app.once("before-quit", () => {
     database.close();
   });
