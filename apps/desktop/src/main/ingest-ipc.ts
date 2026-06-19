@@ -1,17 +1,26 @@
 import { createHash } from "node:crypto";
 import type { IngestUrlRequestDto, IngestUrlResultDto } from "@linkatlas/contracts";
 import { parseIngestUrlRequest } from "@linkatlas/contracts";
-import type { ContentBlock, Document, DocumentVersion } from "@linkatlas/domain";
+import type {
+  ContentBlock,
+  Document,
+  DocumentVersion,
+  GenerationProvider,
+} from "@linkatlas/domain";
 import { AppErrorCode, DocumentStatus, JobStatus } from "@linkatlas/domain";
 import type { ExtractedArticleBlock } from "@linkatlas/ingestion";
 import { extractArticle, FetchError, FetchErrorCode, fetchHtml } from "@linkatlas/ingestion";
-import type { DocumentRepository, JobRepository } from "@linkatlas/storage";
+import type { DocumentRepository, JobRepository, SummaryRepository } from "@linkatlas/storage";
 import { ipcMain } from "electron";
+import { maybeAnalyzeDocument } from "./analysis-summary.js";
 
 export type IngestUrlHandlerOptions = {
   readonly allowedHosts: readonly string[];
   readonly documentRepository: DocumentRepository;
   readonly jobRepository: JobRepository;
+  readonly summaryRepository?: SummaryRepository;
+  readonly generationProvider?: GenerationProvider;
+  readonly analysisModel?: string;
   readonly now?: () => Date;
 };
 
@@ -110,6 +119,15 @@ export function createIngestUrlHandler(
         stage: "stage_storing",
       });
       options.documentRepository.saveDocumentSnapshot({ document, version, blocks });
+      const summary = await maybeAnalyzeDocument({
+        blocks,
+        documentId,
+        generationProvider: options.generationProvider,
+        model: options.analysisModel,
+        now,
+        summaryRepository: options.summaryRepository,
+        versionId,
+      });
       const completedJob = options.jobRepository.complete({ id: job.id, now });
 
       return {
@@ -123,6 +141,7 @@ export function createIngestUrlHandler(
         blockCount: blocks.length,
         excerpt: article.excerpt,
         language: article.language,
+        summary,
       };
     } catch (error) {
       if (error instanceof FetchError) {

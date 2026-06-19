@@ -20,3 +20,5 @@ export { createSqliteJobRepository } from "./job-repository.js";
 export { migrateDatabase } from "./migrate.js";
 export type { SqliteMigration } from "./migrations.js";
 export { sqliteMigrations } from "./migrations.js";
+export type { SaveSummaryInput, SummaryRecord, SummaryRepository } from "./summary-repository.js";
+export { createSqliteSummaryRepository } from "./summary-repository.js";

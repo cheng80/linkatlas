@@ -8,16 +8,19 @@ export {
   parseContract,
 } from "./errors.js";
 export type {
+  DocumentSummaryDto,
   IngestUrlErrorCode,
   IngestUrlRequestDto,
   IngestUrlResultDto,
 } from "./ingest-url.js";
 export {
+  DocumentSummaryDtoSchema,
   IngestUrlErrorCodeSchema,
   IngestUrlRequestSchema,
   IngestUrlResultSchema,
   parseIngestUrlRequest,
   parseIngestUrlResult,
+  SummaryTextDtoSchema,
 } from "./ingest-url.js";
 export type {
   JobCommandRequestDto,

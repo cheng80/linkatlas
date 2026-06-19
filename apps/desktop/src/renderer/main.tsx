@@ -1,10 +1,11 @@
-import type { JobDto } from "@linkatlas/contracts";
+import type { DocumentSummaryDto, JobDto } from "@linkatlas/contracts";
 import { StrictMode, useCallback, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 
 import { JobList } from "./job-list.js";
 import { LibraryCard } from "./library-card.js";
 import { OllamaStatusBadge, type OllamaStatusState } from "./ollama-status-badge.js";
+import { SummaryCard } from "./summary-card.js";
 import "./styles.css";
 
 type IngestState =
@@ -18,6 +19,7 @@ type IngestState =
       readonly blockCount: number;
       readonly excerpt: string | null;
       readonly language: string | null;
+      readonly summary: DocumentSummaryDto | null;
     }
   | { readonly kind: "rejected"; readonly message: string };
 
@@ -120,6 +122,7 @@ function App(): React.JSX.Element {
         blockCount: result.blockCount,
         excerpt: result.excerpt,
         language: result.language,
+        summary: result.summary,
       });
       await refreshJobs();
       return;
@@ -188,6 +191,9 @@ function App(): React.JSX.Element {
             {renderIngestState(ingestState)}
           </p>
           {ingestState.kind === "accepted" ? <LibraryCard state={ingestState} /> : null}
+          {ingestState.kind === "accepted" && ingestState.summary !== null ? (
+            <SummaryCard summary={ingestState.summary} />
+          ) : null}
           <JobList jobs={jobs} onCancel={cancelJob} onRetry={retryJob} />
         </section>
       </section>

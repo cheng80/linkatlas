@@ -80,4 +80,30 @@ CREATE UNIQUE INDEX idx_jobs_idempotency_key ON jobs(idempotency_key);
 CREATE INDEX idx_jobs_ready ON jobs(status, lease_expires_at, created_at);
 `,
   },
+  {
+    id: "0003_summaries",
+    sql: `
+CREATE TABLE summaries (
+  id TEXT PRIMARY KEY,
+  document_id TEXT NOT NULL,
+  document_version_id TEXT NOT NULL,
+  kind TEXT NOT NULL,
+  content_json TEXT NOT NULL,
+  model_name TEXT NOT NULL,
+  prompt_name TEXT NOT NULL,
+  prompt_version TEXT NOT NULL,
+  input_hash TEXT NOT NULL,
+  is_user_edited INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY(document_id) REFERENCES documents(id) ON DELETE CASCADE,
+  FOREIGN KEY(document_version_id) REFERENCES document_versions(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_summaries_document_id ON summaries(document_id, created_at);
+CREATE UNIQUE INDEX idx_summaries_generated_version_kind
+  ON summaries(document_version_id, kind)
+  WHERE is_user_edited = 0;
+`,
+  },
 ];

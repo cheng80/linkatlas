@@ -11,7 +11,7 @@ export type ModelInfo = {
 export type GenerateTextRequest = {
   readonly model: string;
   readonly prompt: string;
-  readonly abortSignal?: AbortSignal;
+  readonly abortSignal?: AbortSignal | undefined;
 };
 
 export type GenerateTextResult = {
@@ -28,7 +28,7 @@ export type StructuredRequest<T> = {
   readonly prompt: string;
   readonly schema: JsonSchemaObject;
   readonly parse: (value: unknown) => T;
-  readonly abortSignal?: AbortSignal;
+  readonly abortSignal?: AbortSignal | undefined;
 };
 
 export type ChatMessage = {
@@ -39,7 +39,7 @@ export type ChatMessage = {
 export type ChatRequest = {
   readonly model: string;
   readonly messages: readonly ChatMessage[];
-  readonly abortSignal?: AbortSignal;
+  readonly abortSignal?: AbortSignal | undefined;
 };
 
 export interface StreamSink {
@@ -49,7 +49,7 @@ export interface StreamSink {
 export type EmbedRequest = {
   readonly model: string;
   readonly input: readonly string[];
-  readonly abortSignal?: AbortSignal;
+  readonly abortSignal?: AbortSignal | undefined;
 };
 
 export interface GenerationProvider {

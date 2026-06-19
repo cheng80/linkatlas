@@ -14,6 +14,7 @@
     "test": "vitest --root ../.. run apps/desktop/src"
   },
   "dependencies": {
+    "@linkatlas/analysis": "workspace:*",
     "@linkatlas/contracts": "workspace:*",
     "@linkatlas/domain": "workspace:*",
     "@linkatlas/ingestion": "workspace:*",

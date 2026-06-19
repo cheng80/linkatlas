@@ -204,7 +204,8 @@ button:disabled {
   color: #9a3412;
 }
 
-.library-card {
+.library-card,
+.summary-card {
   background: #ffffff;
   border: 1px solid #d7dde2;
   border-radius: 8px;
@@ -215,7 +216,8 @@ button:disabled {
   padding: 18px;
 }
 
-.library-card h3 {
+.library-card h3,
+.summary-card h3 {
   color: #172026;
   font-size: 20px;
   letter-spacing: 0;
@@ -223,33 +225,38 @@ button:disabled {
   margin: 4px 0 0;
 }
 
-.library-card p {
+.library-card p,
+.summary-card p {
   color: #465560;
   line-height: 1.55;
   margin: 0;
 }
 
-.library-card dl {
+.library-card dl,
+.summary-card dl {
   display: flex;
   gap: 12px;
   margin: 0;
 }
 
-.library-card dl div {
+.library-card dl div,
+.summary-card dl div {
   background: #f5f7f8;
   border-radius: 8px;
   min-width: 110px;
   padding: 10px 12px;
 }
 
-.library-card dt {
+.library-card dt,
+.summary-card dt {
   color: #66727d;
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
 }
 
-.library-card dd {
+.library-card dd,
+.summary-card dd {
   color: #172026;
   font-size: 15px;
   font-weight: 800;
@@ -259,6 +266,20 @@ button:disabled {
 .library-card a {
   color: #245c73;
   overflow-wrap: anywhere;
+}
+
+.summary-card ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.summary-card li small {
+  color: #66727d;
+  display: block;
+  font-size: 12px;
+  margin-top: 3px;
 }
 
 .jobs-panel {

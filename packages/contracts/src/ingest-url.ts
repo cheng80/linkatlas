@@ -21,6 +21,21 @@ export const IngestUrlErrorCodeSchema = z.enum([
 
 export type IngestUrlErrorCode = z.infer<typeof IngestUrlErrorCodeSchema>;
 
+export const SummaryTextDtoSchema = z.object({
+  text: z.string().min(1),
+  evidenceBlockIds: z.array(z.string().min(1)),
+});
+
+export const DocumentSummaryDtoSchema = z.object({
+  headline: z.string().min(1),
+  abstract: z.string().min(1),
+  keyPoints: z.array(SummaryTextDtoSchema),
+  modelName: z.string().min(1),
+  promptVersion: z.string().min(1),
+});
+
+export type DocumentSummaryDto = z.infer<typeof DocumentSummaryDtoSchema>;
+
 export const IngestUrlResultSchema = z.discriminatedUnion("ok", [
   z.object({
     ok: z.literal(true),
@@ -33,6 +48,7 @@ export const IngestUrlResultSchema = z.discriminatedUnion("ok", [
     blockCount: z.number().int().nonnegative(),
     excerpt: z.string().nullable(),
     language: z.string().nullable(),
+    summary: DocumentSummaryDtoSchema.nullable(),
   }),
   z.object({
     ok: z.literal(false),

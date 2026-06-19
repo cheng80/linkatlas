@@ -5,6 +5,7 @@ import {
   createSqliteConnection,
   createSqliteDocumentRepository,
   createSqliteJobRepository,
+  createSqliteSummaryRepository,
   type LinkAtlasDatabase,
   migrateDatabase,
 } from "@linkatlas/storage";
@@ -54,17 +55,21 @@ export function createMainWindow(): BrowserWindow {
 app.whenReady().then(() => {
   const database = createAppDatabase();
   const jobRepository = createSqliteJobRepository(database);
+  const generationProvider = new OllamaGenerationProvider({
+    baseUrl: process.env[ollamaBaseUrlKey] ?? "http://127.0.0.1:11434",
+    timeoutMs: 1_000,
+  });
   registerIngestIpc({
     allowedHosts: allowedFetchHosts(),
+    analysisModel: "gemma4:12b",
     documentRepository: createSqliteDocumentRepository(database),
+    generationProvider,
     jobRepository,
+    summaryRepository: createSqliteSummaryRepository(database),
   });
   registerJobIpc({ jobRepository });
   registerModelIpc({
-    generationProvider: new OllamaGenerationProvider({
-      baseUrl: process.env[ollamaBaseUrlKey] ?? "http://127.0.0.1:11434",
-      timeoutMs: 1_000,
-    }),
+    generationProvider,
   });
   app.once("before-quit", () => {
     database.close();
