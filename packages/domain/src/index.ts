@@ -9,12 +9,18 @@ export { AppError, AppErrorCode } from "./errors.js";
 export type { Job, JobStage } from "./jobs.js";
 export { JobStatus } from "./jobs.js";
 export type {
+  ChatMessage,
+  ChatRequest,
   EmbeddingProvider,
+  EmbedRequest,
   GenerateTextRequest,
   GenerateTextResult,
   GenerationProvider,
+  JsonSchemaObject,
   ModelInfo,
   ProviderHealth,
+  StreamSink,
+  StructuredRequest,
 } from "./providers.js";
 export type {
   VectorHit,

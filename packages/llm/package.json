@@ -1,0 +1,20 @@
+{
+  "name": "@linkatlas/llm",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "test": "vitest --root ../.. run packages/llm/src"
+  },
+  "dependencies": {
+    "@linkatlas/domain": "workspace:*",
+    "zod": "^4.2.1"
+  }
+}

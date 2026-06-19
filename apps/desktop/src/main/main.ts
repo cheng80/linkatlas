@@ -1,5 +1,6 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { OllamaGenerationProvider } from "@linkatlas/llm";
 import {
   createSqliteConnection,
   createSqliteDocumentRepository,
@@ -11,12 +12,14 @@ import { app, BrowserWindow } from "electron";
 
 import { registerIngestIpc } from "./ingest-ipc.js";
 import { registerJobIpc } from "./job-ipc.js";
+import { registerModelIpc } from "./model-ipc.js";
 import { createSecureWebPreferences, isAllowedNavigation } from "./security.js";
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url));
 const e2eEnvironmentKey = "LINKATLAS_E2E";
 const e2eUserDataDirectoryKey = "LINKATLAS_E2E_USER_DATA_DIR";
 const allowedFetchHostsKey = "LINKATLAS_ALLOWED_FETCH_HOSTS";
+const ollamaBaseUrlKey = "LINKATLAS_OLLAMA_BASE_URL";
 
 const e2eUserDataDirectory = process.env[e2eUserDataDirectoryKey];
 if (e2eUserDataDirectory !== undefined && e2eUserDataDirectory.trim().length > 0) {
@@ -57,6 +60,12 @@ app.whenReady().then(() => {
     jobRepository,
   });
   registerJobIpc({ jobRepository });
+  registerModelIpc({
+    generationProvider: new OllamaGenerationProvider({
+      baseUrl: process.env[ollamaBaseUrlKey] ?? "http://127.0.0.1:11434",
+      timeoutMs: 1_000,
+    }),
+  });
   app.once("before-quit", () => {
     database.close();
   });

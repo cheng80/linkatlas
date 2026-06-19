@@ -5,12 +5,16 @@ import type {
   JobCommandRequestDto,
   JobCommandResultDto,
   ListJobsResultDto,
+  ListModelsResultDto,
+  ProviderHealthDto,
 } from "@linkatlas/contracts";
 
 export const linkAtlasIpcChannels = {
   cancelJob: "linkAtlas:jobs:cancel",
   ingestUrl: "linkAtlas:ingestUrl",
   listJobs: "linkAtlas:jobs:list",
+  listModels: "linkAtlas:models:list",
+  modelHealth: "linkAtlas:models:health",
   retryJob: "linkAtlas:jobs:retry",
 } as const;
 
@@ -25,5 +29,9 @@ export type LinkAtlasApi = {
     readonly cancel: (input: JobCommandRequestDto) => Promise<JobCommandResultDto>;
     readonly list: () => Promise<ListJobsResultDto>;
     readonly retry: (input: JobCommandRequestDto) => Promise<JobCommandResultDto>;
+  };
+  readonly models: {
+    readonly health: () => Promise<ProviderHealthDto>;
+    readonly list: () => Promise<ListModelsResultDto>;
   };
 };

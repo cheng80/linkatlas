@@ -34,3 +34,5 @@ export {
   ListJobsResultSchema,
   parseJobCommandRequest,
 } from "./jobs.js";
+export type { ListModelsResultDto, ModelInfoDto, ProviderHealthDto } from "./models.js";
+export { ListModelsResultSchema, ModelInfoDtoSchema, ProviderHealthDtoSchema } from "./models.js";

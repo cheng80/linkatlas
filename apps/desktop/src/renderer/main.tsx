@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 
 import { JobList } from "./job-list.js";
 import { LibraryCard } from "./library-card.js";
+import { OllamaStatusBadge, type OllamaStatusState } from "./ollama-status-badge.js";
 import "./styles.css";
 
 type IngestState =
@@ -25,8 +26,11 @@ type AppVersionState =
   | { readonly kind: "ready"; readonly version: string }
   | { readonly kind: "failed"; readonly message: string };
 
+const requiredGenerationModel = "gemma4:12b";
+
 function App(): React.JSX.Element {
   const [versionState, setVersionState] = useState<AppVersionState>({ kind: "loading" });
+  const [ollamaState, setOllamaState] = useState<OllamaStatusState>({ kind: "checking" });
   const [url, setUrl] = useState("");
   const [ingestState, setIngestState] = useState<IngestState>({ kind: "idle" });
   const [jobs, setJobs] = useState<readonly JobDto[]>([]);
@@ -63,6 +67,44 @@ function App(): React.JSX.Element {
   useEffect(() => {
     void refreshJobs();
   }, [refreshJobs]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadOllamaStatus(): Promise<void> {
+      const health = await window.linkAtlas.models.health();
+      if (!active) {
+        return;
+      }
+      if (!health.ok) {
+        setOllamaState({ kind: "unavailable", message: health.message });
+        return;
+      }
+
+      const models = await window.linkAtlas.models.list();
+      if (!active) {
+        return;
+      }
+      if (!models.ok) {
+        setOllamaState({ kind: "failed", message: models.message });
+        return;
+      }
+      const hasRequiredModel = models.models.some(
+        (model) => model.name === requiredGenerationModel,
+      );
+      setOllamaState(
+        hasRequiredModel
+          ? { kind: "ready", modelCount: models.models.length }
+          : { kind: "missing", model: requiredGenerationModel },
+      );
+    }
+
+    void loadOllamaStatus();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   async function submitUrl(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -134,6 +176,7 @@ function App(): React.JSX.Element {
           <div className="model-status" data-testid="app-version">
             {renderVersion(versionState)}
           </div>
+          <OllamaStatusBadge state={ollamaState} />
         </header>
         <section className="inbox-panel">
           <p className="eyebrow">Local-first knowledge base</p>

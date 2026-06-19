@@ -9,7 +9,7 @@
     "build": "pnpm -r --sort run build",
     "format": "biome format --write .",
     "lint": "biome check . && pnpm test:boundaries",
-    "typecheck": "tsc -b packages/contracts packages/domain packages/storage packages/ingestion apps/desktop/tsconfig.main.json apps/desktop/tsconfig.preload.json tests && tsc -p apps/desktop/tsconfig.renderer.json --noEmit",
+    "typecheck": "tsc -b packages/contracts packages/domain packages/storage packages/ingestion packages/llm apps/desktop/tsconfig.main.json apps/desktop/tsconfig.preload.json tests && tsc -p apps/desktop/tsconfig.renderer.json --noEmit",
     "rebuild:node": "pnpm --filter @linkatlas/storage exec node ../../scripts/rebuild-better-sqlite3-node.cjs",
     "test": "pnpm rebuild:node && vitest run",
     "test:boundaries": "vitest run tests/boundaries",
