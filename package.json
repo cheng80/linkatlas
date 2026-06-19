@@ -10,7 +10,7 @@
     "format": "biome format --write .",
     "lint": "biome check . && pnpm test:boundaries",
     "typecheck": "tsc -b packages/contracts packages/domain packages/storage packages/ingestion apps/desktop/tsconfig.main.json apps/desktop/tsconfig.preload.json tests && tsc -p apps/desktop/tsconfig.renderer.json --noEmit",
-    "rebuild:node": "pnpm --filter @linkatlas/storage exec node -e \"const {dirname}=require('node:path'); const {spawnSync}=require('node:child_process'); const cwd=dirname(require.resolve('better-sqlite3/package.json')); const result=spawnSync(process.platform==='win32'?'pnpm.cmd':'pnpm',['run','build-release'],{cwd,stdio:'inherit'}); process.exit(result.status ?? 1);\"",
+    "rebuild:node": "pnpm --filter @linkatlas/storage exec node ../../scripts/rebuild-better-sqlite3-node.cjs",
     "test": "pnpm rebuild:node && vitest run",
     "test:boundaries": "vitest run tests/boundaries",
     "test:integration": "pnpm rebuild:node && vitest run tests/integration",

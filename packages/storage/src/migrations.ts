@@ -56,4 +56,28 @@ CREATE INDEX idx_content_blocks_document_version_id ON content_blocks(document_v
 CREATE UNIQUE INDEX idx_content_blocks_version_ordinal ON content_blocks(document_version_id, ordinal);
 `,
   },
+  {
+    id: "0002_jobs",
+    sql: `
+CREATE TABLE jobs (
+  id TEXT PRIMARY KEY,
+  document_id TEXT,
+  idempotency_key TEXT NOT NULL,
+  status TEXT NOT NULL,
+  initial_stage TEXT NOT NULL,
+  stage TEXT,
+  progress INTEGER NOT NULL,
+  lease_owner TEXT,
+  lease_expires_at TEXT,
+  error_code TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  completed_at TEXT,
+  FOREIGN KEY(document_id) REFERENCES documents(id) ON DELETE SET NULL
+);
+
+CREATE UNIQUE INDEX idx_jobs_idempotency_key ON jobs(idempotency_key);
+CREATE INDEX idx_jobs_ready ON jobs(status, lease_expires_at, created_at);
+`,
+  },
 ];
