@@ -136,4 +136,76 @@ CREATE VIRTUAL TABLE chunk_fts USING fts5(
 );
 `,
   },
+  {
+    id: "0005_knowledge_graph",
+    sql: `
+CREATE TABLE topics (
+  id TEXT PRIMARY KEY,
+  label TEXT NOT NULL,
+  normalized_label TEXT NOT NULL UNIQUE,
+  description TEXT,
+  parent_id TEXT,
+  is_user_approved INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL,
+  FOREIGN KEY(parent_id) REFERENCES topics(id) ON DELETE SET NULL
+);
+
+CREATE TABLE document_topics (
+  document_id TEXT NOT NULL,
+  topic_id TEXT NOT NULL,
+  confidence REAL NOT NULL,
+  source TEXT NOT NULL,
+  is_pinned INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY(document_id, topic_id),
+  FOREIGN KEY(document_id) REFERENCES documents(id) ON DELETE CASCADE,
+  FOREIGN KEY(topic_id) REFERENCES topics(id) ON DELETE CASCADE
+);
+
+CREATE TABLE entities (
+  id TEXT PRIMARY KEY,
+  canonical_name TEXT NOT NULL,
+  normalized_name TEXT NOT NULL,
+  entity_type TEXT NOT NULL,
+  aliases_json TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  UNIQUE(normalized_name, entity_type)
+);
+
+CREATE TABLE mentions (
+  id TEXT PRIMARY KEY,
+  document_id TEXT NOT NULL,
+  chunk_id TEXT,
+  entity_id TEXT NOT NULL,
+  surface_text TEXT NOT NULL,
+  block_ids_json TEXT NOT NULL,
+  confidence REAL NOT NULL,
+  FOREIGN KEY(document_id) REFERENCES documents(id) ON DELETE CASCADE,
+  FOREIGN KEY(chunk_id) REFERENCES chunks(id) ON DELETE SET NULL,
+  FOREIGN KEY(entity_id) REFERENCES entities(id) ON DELETE CASCADE
+);
+
+CREATE TABLE document_relations (
+  source_document_id TEXT NOT NULL,
+  target_document_id TEXT NOT NULL,
+  relation_type TEXT NOT NULL,
+  semantic_score REAL,
+  topic_score REAL,
+  entity_score REAL,
+  final_score REAL NOT NULL,
+  explanation_json TEXT NOT NULL,
+  evidence_json TEXT,
+  source TEXT NOT NULL,
+  is_user_pinned INTEGER NOT NULL DEFAULT 0,
+  is_user_removed INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL,
+  PRIMARY KEY(source_document_id, target_document_id, relation_type),
+  FOREIGN KEY(source_document_id) REFERENCES documents(id) ON DELETE CASCADE,
+  FOREIGN KEY(target_document_id) REFERENCES documents(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_document_topics_topic_id ON document_topics(topic_id, document_id);
+CREATE INDEX idx_mentions_entity_id ON mentions(entity_id, document_id);
+CREATE INDEX idx_document_relations_source_score ON document_relations(source_document_id, final_score);
+`,
+  },
 ];

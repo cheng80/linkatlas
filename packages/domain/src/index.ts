@@ -3,8 +3,11 @@ export type {
   ContentBlockId,
   DocumentId,
   DocumentVersionId,
+  EntityId,
   JobId,
+  MentionId,
   SummaryId,
+  TopicId,
 } from "./brand.js";
 export type {
   ContentBlock,

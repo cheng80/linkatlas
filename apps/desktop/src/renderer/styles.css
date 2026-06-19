@@ -112,6 +112,89 @@ input {
   padding-top: 18px;
 }
 
+.related-panel,
+.topic-grid {
+  max-width: 760px;
+}
+
+.related-panel {
+  border-top: 1px solid #d7dde2;
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 18px;
+}
+
+.related-panel ul,
+.topic-grid {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.related-panel li,
+.topic-card {
+  background: #ffffff;
+  border: 1px solid #d7dde2;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.related-panel li {
+  align-items: center;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(220px, 1fr) auto;
+}
+
+.related-panel li > div:first-child,
+.topic-card {
+  display: grid;
+  gap: 6px;
+}
+
+.related-panel strong,
+.topic-card h3 {
+  color: #172026;
+}
+
+.related-panel span,
+.topic-card p {
+  color: #465560;
+}
+
+.related-panel small,
+.topic-card span {
+  color: #66727d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.relation-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.relation-actions button {
+  font-size: 13px;
+  min-height: 32px;
+  padding: 0 10px;
+}
+
+.topic-card > div {
+  align-items: baseline;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.topic-card h3,
+.topic-card p {
+  margin: 0;
+}
+
 .search-results ul {
   display: grid;
   gap: 8px;

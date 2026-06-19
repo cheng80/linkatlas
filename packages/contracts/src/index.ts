@@ -37,6 +37,26 @@ export {
   ListJobsResultSchema,
   parseJobCommandRequest,
 } from "./jobs.js";
+export type {
+  ListRelatedDocumentsRequestDto,
+  ListRelatedDocumentsResultDto,
+  ListTopicsResultDto,
+  RelatedDocumentDto,
+  RelationCommandRequestDto,
+  RelationCommandResultDto,
+  TopicDto,
+} from "./knowledge.js";
+export {
+  ListRelatedDocumentsRequestSchema,
+  ListRelatedDocumentsResultSchema,
+  ListTopicsResultSchema,
+  parseListRelatedDocumentsRequest,
+  parseRelationCommandRequest,
+  RelatedDocumentDtoSchema,
+  RelationCommandRequestSchema,
+  RelationCommandResultSchema,
+  TopicDtoSchema,
+} from "./knowledge.js";
 export type { ListModelsResultDto, ModelInfoDto, ProviderHealthDto } from "./models.js";
 export { ListModelsResultSchema, ModelInfoDtoSchema, ProviderHealthDtoSchema } from "./models.js";
 export type { SearchQueryDto, SearchResultDto } from "./search.js";

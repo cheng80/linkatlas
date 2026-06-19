@@ -4,3 +4,6 @@ export type ContentBlockId = `block_${string}`;
 export type ChunkId = `chunk_${string}`;
 export type JobId = `job_${string}`;
 export type SummaryId = `summary_${string}`;
+export type TopicId = `topic_${string}`;
+export type EntityId = `entity_${string}`;
+export type MentionId = `mention_${string}`;

@@ -6,7 +6,12 @@ import type {
   JobCommandResultDto,
   ListJobsResultDto,
   ListModelsResultDto,
+  ListRelatedDocumentsRequestDto,
+  ListRelatedDocumentsResultDto,
+  ListTopicsResultDto,
   ProviderHealthDto,
+  RelationCommandRequestDto,
+  RelationCommandResultDto,
   SearchQueryDto,
   SearchResultDto,
 } from "@linkatlas/contracts";
@@ -16,7 +21,11 @@ export const linkAtlasIpcChannels = {
   ingestUrl: "linkAtlas:ingestUrl",
   listJobs: "linkAtlas:jobs:list",
   listModels: "linkAtlas:models:list",
+  listRelatedDocuments: "linkAtlas:knowledge:related:list",
+  listTopics: "linkAtlas:knowledge:topics:list",
   modelHealth: "linkAtlas:models:health",
+  pinRelation: "linkAtlas:knowledge:relation:pin",
+  removeRelation: "linkAtlas:knowledge:relation:remove",
   retryJob: "linkAtlas:jobs:retry",
   search: "linkAtlas:search:query",
 } as const;
@@ -32,6 +41,16 @@ export type LinkAtlasApi = {
     readonly cancel: (input: JobCommandRequestDto) => Promise<JobCommandResultDto>;
     readonly list: () => Promise<ListJobsResultDto>;
     readonly retry: (input: JobCommandRequestDto) => Promise<JobCommandResultDto>;
+  };
+  readonly knowledge: {
+    readonly listRelated: (
+      input: ListRelatedDocumentsRequestDto,
+    ) => Promise<ListRelatedDocumentsResultDto>;
+    readonly listTopics: () => Promise<ListTopicsResultDto>;
+    readonly pinRelation: (input: RelationCommandRequestDto) => Promise<RelationCommandResultDto>;
+    readonly removeRelation: (
+      input: RelationCommandRequestDto,
+    ) => Promise<RelationCommandResultDto>;
   };
   readonly models: {
     readonly health: () => Promise<ProviderHealthDto>;

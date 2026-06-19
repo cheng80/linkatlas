@@ -16,6 +16,7 @@ import type {
   ChunkRepository,
   DocumentRepository,
   JobRepository,
+  KnowledgeRepository,
   SummaryRepository,
 } from "@linkatlas/storage";
 import { ipcMain } from "electron";
@@ -27,6 +28,7 @@ export type IngestUrlHandlerOptions = {
   readonly documentRepository: DocumentRepository;
   readonly jobRepository: JobRepository;
   readonly chunkRepository?: ChunkRepository;
+  readonly knowledgeRepository?: KnowledgeRepository;
   readonly summaryRepository?: SummaryRepository;
   readonly generationProvider?: GenerationProvider;
   readonly embeddingProvider?: EmbeddingProvider;
@@ -147,6 +149,7 @@ export function createIngestUrlHandler(
         blocks,
         documentId,
         generationProvider: options.generationProvider,
+        knowledgeRepository: options.knowledgeRepository,
         model: options.analysisModel,
         now,
         summaryRepository: options.summaryRepository,

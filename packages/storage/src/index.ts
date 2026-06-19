@@ -19,6 +19,15 @@ export type {
   UpdateJobProgressInput,
 } from "./job-repository.js";
 export { createSqliteJobRepository } from "./job-repository.js";
+export type {
+  EntityInput,
+  EntityRecord,
+  KnowledgeRepository,
+  RelatedDocumentRecord,
+  TopicInput,
+  TopicRecord,
+} from "./knowledge-repository.js";
+export { createSqliteKnowledgeRepository, normalizeLabel } from "./knowledge-repository.js";
 export { migrateDatabase } from "./migrate.js";
 export type { SqliteMigration } from "./migrations.js";
 export { sqliteMigrations } from "./migrations.js";

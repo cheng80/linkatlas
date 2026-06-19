@@ -1,4 +1,10 @@
-import type { DocumentSummaryDto, JobDto, SearchResultDto } from "@linkatlas/contracts";
+import type {
+  DocumentSummaryDto,
+  JobDto,
+  RelatedDocumentDto,
+  SearchResultDto,
+  TopicDto,
+} from "@linkatlas/contracts";
 import { StrictMode, useCallback, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 
@@ -13,6 +19,7 @@ type IngestState =
   | { readonly kind: "submitting" }
   | {
       readonly kind: "accepted";
+      readonly documentId: string;
       readonly title: string;
       readonly finalUrl: string;
       readonly jobStatus: string;
@@ -28,7 +35,7 @@ type AppVersionState =
   | { readonly kind: "ready"; readonly version: string }
   | { readonly kind: "failed"; readonly message: string };
 
-const requiredGenerationModel = "gemma4:12b";
+const requiredGenerationModel = "gemma4:e4b-it-qat";
 
 function App(): React.JSX.Element {
   const [versionState, setVersionState] = useState<AppVersionState>({ kind: "loading" });
@@ -38,6 +45,10 @@ function App(): React.JSX.Element {
   const [searchResults, setSearchResults] = useState<readonly SearchResultDto[]>([]);
   const [ingestState, setIngestState] = useState<IngestState>({ kind: "idle" });
   const [jobs, setJobs] = useState<readonly JobDto[]>([]);
+  const [topics, setTopics] = useState<readonly TopicDto[]>([]);
+  const [relatedSourceId, setRelatedSourceId] = useState<string | null>(null);
+  const [relatedDocuments, setRelatedDocuments] = useState<readonly RelatedDocumentDto[]>([]);
+  const [view, setView] = useState(currentView());
 
   useEffect(() => {
     let active = true;
@@ -71,6 +82,33 @@ function App(): React.JSX.Element {
   useEffect(() => {
     void refreshJobs();
   }, [refreshJobs]);
+
+  const refreshTopics = useCallback(async (): Promise<void> => {
+    const result = await window.linkAtlas.knowledge.listTopics();
+    setTopics(result.topics);
+  }, []);
+
+  const refreshRelated = useCallback(async (documentId: string): Promise<void> => {
+    const result = await window.linkAtlas.knowledge.listRelated({ documentId, limit: 5 });
+    setRelatedSourceId(documentId);
+    setRelatedDocuments(result.related);
+  }, []);
+
+  useEffect(() => {
+    const updateView = (): void => {
+      setView(currentView());
+    };
+    window.addEventListener("hashchange", updateView);
+    return () => {
+      window.removeEventListener("hashchange", updateView);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (view === "topics") {
+      void refreshTopics();
+    }
+  }, [refreshTopics, view]);
 
   useEffect(() => {
     let active = true;
@@ -118,6 +156,7 @@ function App(): React.JSX.Element {
     if (result.ok) {
       setIngestState({
         kind: "accepted",
+        documentId: result.documentId,
         title: result.title,
         finalUrl: result.finalUrl,
         jobStatus: result.jobStatus,
@@ -127,6 +166,8 @@ function App(): React.JSX.Element {
         summary: result.summary,
       });
       await refreshJobs();
+      await refreshTopics();
+      await refreshRelated(result.documentId);
       return;
     }
 
@@ -151,6 +192,28 @@ function App(): React.JSX.Element {
       return;
     }
     setSearchResults(await window.linkAtlas.search.query({ query: searchQuery, limit: 8 }));
+  }
+
+  async function pinRelatedDocument(targetDocumentId: string): Promise<void> {
+    if (relatedSourceId === null) {
+      return;
+    }
+    await window.linkAtlas.knowledge.pinRelation({
+      sourceDocumentId: relatedSourceId,
+      targetDocumentId,
+    });
+    await refreshRelated(relatedSourceId);
+  }
+
+  async function removeRelatedDocument(targetDocumentId: string): Promise<void> {
+    if (relatedSourceId === null) {
+      return;
+    }
+    await window.linkAtlas.knowledge.removeRelation({
+      sourceDocumentId: relatedSourceId,
+      targetDocumentId,
+    });
+    await refreshRelated(relatedSourceId);
   }
 
   return (
@@ -199,36 +262,107 @@ function App(): React.JSX.Element {
           </div>
           <OllamaStatusBadge state={ollamaState} />
         </header>
-        <section className="inbox-panel">
-          <p className="eyebrow">Local-first knowledge base</p>
-          <h2 id="workspace-title">Inbox</h2>
-          <p>URL을 저장하면 정제된 본문 블록이 로컬 Vault에 추가됩니다.</p>
-          <p
-            className={ingestState.kind === "rejected" ? "ingest-message error" : "ingest-message"}
-          >
-            {renderIngestState(ingestState)}
-          </p>
-          {ingestState.kind === "accepted" ? <LibraryCard state={ingestState} /> : null}
-          {ingestState.kind === "accepted" && ingestState.summary !== null ? (
-            <SummaryCard summary={ingestState.summary} />
-          ) : null}
-          {searchResults.length > 0 ? (
-            <section className="search-results" aria-label="Search results">
-              <p className="eyebrow">Search results</p>
-              <ul>
-                {searchResults.map((result) => (
-                  <li key={result.chunkId}>
-                    <strong>{result.headingPath.join(" > ") || result.documentId}</strong>
-                    <span>{result.text}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-          <JobList jobs={jobs} onCancel={cancelJob} onRetry={retryJob} />
-        </section>
+        {view === "topics" ? (
+          <TopicPanel topics={topics} />
+        ) : (
+          <section className="inbox-panel">
+            <p className="eyebrow">Local-first knowledge base</p>
+            <h2 id="workspace-title">Inbox</h2>
+            <p>URL을 저장하면 정제된 본문 블록이 로컬 Vault에 추가됩니다.</p>
+            <p
+              className={
+                ingestState.kind === "rejected" ? "ingest-message error" : "ingest-message"
+              }
+            >
+              {renderIngestState(ingestState)}
+            </p>
+            {ingestState.kind === "accepted" ? <LibraryCard state={ingestState} /> : null}
+            {ingestState.kind === "accepted" && ingestState.summary !== null ? (
+              <SummaryCard summary={ingestState.summary} />
+            ) : null}
+            <RelatedPanel
+              relatedDocuments={relatedDocuments}
+              onPin={pinRelatedDocument}
+              onRemove={removeRelatedDocument}
+            />
+            {searchResults.length > 0 ? (
+              <section className="search-results" aria-label="Search results">
+                <p className="eyebrow">Search results</p>
+                <ul>
+                  {searchResults.map((result) => (
+                    <li key={result.chunkId}>
+                      <strong>{result.headingPath.join(" > ") || result.documentId}</strong>
+                      <span>{result.text}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+            <JobList jobs={jobs} onCancel={cancelJob} onRetry={retryJob} />
+          </section>
+        )}
       </section>
     </main>
+  );
+}
+
+function TopicPanel(input: { readonly topics: readonly TopicDto[] }): React.JSX.Element {
+  return (
+    <section className="inbox-panel">
+      <p className="eyebrow">Topic map</p>
+      <h2 id="workspace-title">Topics</h2>
+      <p>분석된 문서에서 안정화된 주제만 병합해 보여줍니다.</p>
+      <div className="topic-grid">
+        {input.topics.map((topic) => (
+          <article className="topic-card" key={topic.id}>
+            <div>
+              <h3>{topic.label}</h3>
+              <span>{topic.documentCount} docs</span>
+            </div>
+            {topic.description !== null && topic.description.length > 0 ? (
+              <p>{topic.description}</p>
+            ) : null}
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function RelatedPanel(input: {
+  readonly relatedDocuments: readonly RelatedDocumentDto[];
+  readonly onPin: (targetDocumentId: string) => Promise<void>;
+  readonly onRemove: (targetDocumentId: string) => Promise<void>;
+}): React.JSX.Element | null {
+  if (input.relatedDocuments.length === 0) {
+    return null;
+  }
+  return (
+    <section className="related-panel" aria-label="Related documents">
+      <p className="eyebrow">Related</p>
+      <ul>
+        {input.relatedDocuments.map((document) => (
+          <li key={document.documentId}>
+            <div>
+              <strong>{document.title}</strong>
+              <span>{document.reason}</span>
+              <small>
+                score {document.score.toFixed(2)}
+                {document.sharedTopics.length > 0 ? ` · ${document.sharedTopics.join(", ")}` : ""}
+              </small>
+            </div>
+            <div className="relation-actions">
+              <button type="button" onClick={() => void input.onPin(document.documentId)}>
+                {document.isPinned ? "Pinned" : "Pin"}
+              </button>
+              <button type="button" onClick={() => void input.onRemove(document.documentId)}>
+                Remove
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
@@ -262,6 +396,10 @@ function renderVersion(state: AppVersionState): string {
 
 function assertNever(value: never): never {
   throw new Error(`Unhandled state: ${String(value)}`);
+}
+
+function currentView(): "inbox" | "topics" {
+  return window.location.hash === "#topics" ? "topics" : "inbox";
 }
 
 const rootElement = document.querySelector("#root");

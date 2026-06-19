@@ -22,6 +22,20 @@ const api: LinkAtlasApi = {
       return await electron.ipcRenderer.invoke("linkAtlas:jobs:retry", input);
     },
   },
+  knowledge: {
+    listRelated: async (input) => {
+      return await electron.ipcRenderer.invoke("linkAtlas:knowledge:related:list", input);
+    },
+    listTopics: async () => {
+      return await electron.ipcRenderer.invoke("linkAtlas:knowledge:topics:list");
+    },
+    pinRelation: async (input) => {
+      return await electron.ipcRenderer.invoke("linkAtlas:knowledge:relation:pin", input);
+    },
+    removeRelation: async (input) => {
+      return await electron.ipcRenderer.invoke("linkAtlas:knowledge:relation:remove", input);
+    },
+  },
   models: {
     health: async () => {
       return await electron.ipcRenderer.invoke("linkAtlas:models:health");

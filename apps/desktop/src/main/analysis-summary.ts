@@ -2,13 +2,14 @@ import { createHash } from "node:crypto";
 import { analyzeDocument, type DocumentAnalysis } from "@linkatlas/analysis";
 import type { DocumentSummaryDto } from "@linkatlas/contracts";
 import type { ContentBlock, GenerationProvider } from "@linkatlas/domain";
-import type { SummaryRepository } from "@linkatlas/storage";
+import type { KnowledgeRepository, SummaryRepository } from "@linkatlas/storage";
 
 export async function maybeAnalyzeDocument(input: {
   readonly blocks: readonly ContentBlock[];
   readonly documentId: `doc_${string}`;
   readonly versionId: `docver_${string}`;
   readonly generationProvider: GenerationProvider | undefined;
+  readonly knowledgeRepository: KnowledgeRepository | undefined;
   readonly summaryRepository: SummaryRepository | undefined;
   readonly model: string | undefined;
   readonly now: Date;
@@ -43,6 +44,31 @@ export async function maybeAnalyzeDocument(input: {
       promptName: result.metadata.promptName,
       promptVersion: result.metadata.promptVersion,
       updatedAt: input.now,
+    });
+    input.knowledgeRepository?.upsertDocumentTopics({
+      documentId: input.documentId,
+      now: input.now,
+      topics: result.analysis.topics.map((topic) => ({
+        confidence: topic.confidence,
+        description: topic.description,
+        label: topic.label,
+      })),
+    });
+    input.knowledgeRepository?.upsertDocumentEntities({
+      documentId: input.documentId,
+      entities: result.analysis.entities.map((entity) => ({
+        aliases: entity.aliases,
+        blockIds: entity.evidenceBlockIds,
+        confidence: entity.confidence,
+        name: entity.name,
+        type: entity.type,
+      })),
+      now: input.now,
+    });
+    input.knowledgeRepository?.refreshDocumentRelations({
+      documentId: input.documentId,
+      limit: 5,
+      now: input.now,
     });
     return toSummaryDto(result.analysis, result.metadata.modelName, result.metadata.promptVersion);
   } catch {

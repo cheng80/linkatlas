@@ -7,6 +7,7 @@ import {
   createSqliteConnection,
   createSqliteDocumentRepository,
   createSqliteJobRepository,
+  createSqliteKnowledgeRepository,
   createSqliteSummaryRepository,
   type LinkAtlasDatabase,
   migrateDatabase,
@@ -15,6 +16,7 @@ import { app, BrowserWindow } from "electron";
 
 import { registerIngestIpc } from "./ingest-ipc.js";
 import { registerJobIpc } from "./job-ipc.js";
+import { registerKnowledgeIpc } from "./knowledge-ipc.js";
 import { registerModelIpc } from "./model-ipc.js";
 import { registerSearchIpc } from "./search-ipc.js";
 import { createSecureWebPreferences, isAllowedNavigation } from "./security.js";
@@ -24,6 +26,8 @@ const e2eEnvironmentKey = "LINKATLAS_E2E";
 const e2eUserDataDirectoryKey = "LINKATLAS_E2E_USER_DATA_DIR";
 const allowedFetchHostsKey = "LINKATLAS_ALLOWED_FETCH_HOSTS";
 const ollamaBaseUrlKey = "LINKATLAS_OLLAMA_BASE_URL";
+const defaultAnalysisModel = "gemma4:e4b-it-qat";
+const defaultEmbeddingModel = "embeddinggemma:300m-qat-q8_0";
 
 const e2eUserDataDirectory = process.env[e2eUserDataDirectoryKey];
 if (e2eUserDataDirectory !== undefined && e2eUserDataDirectory.trim().length > 0) {
@@ -58,6 +62,7 @@ export function createMainWindow(): BrowserWindow {
 app.whenReady().then(() => {
   const database = createAppDatabase();
   const jobRepository = createSqliteJobRepository(database);
+  const knowledgeRepository = createSqliteKnowledgeRepository(database);
   const chunkRepository = createSqliteChunkRepository(database);
   const vectorIndex = new InMemoryVectorIndex();
   const generationProvider = new OllamaGenerationProvider({
@@ -70,23 +75,25 @@ app.whenReady().then(() => {
   });
   registerIngestIpc({
     allowedHosts: allowedFetchHosts(),
-    analysisModel: "gemma4:12b",
+    analysisModel: defaultAnalysisModel,
     chunkRepository,
     documentRepository: createSqliteDocumentRepository(database),
-    embeddingModel: "embeddinggemma",
+    embeddingModel: defaultEmbeddingModel,
     embeddingProvider,
     generationProvider,
     jobRepository,
+    knowledgeRepository,
     summaryRepository: createSqliteSummaryRepository(database),
     vectorIndex,
   });
   registerJobIpc({ jobRepository });
+  registerKnowledgeIpc({ knowledgeRepository });
   registerModelIpc({
     generationProvider,
   });
   registerSearchIpc({
     chunkRepository,
-    embeddingModel: "embeddinggemma",
+    embeddingModel: defaultEmbeddingModel,
     embeddingProvider,
     vectorIndex,
   });
